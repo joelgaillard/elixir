@@ -1,0 +1,10 @@
+:root {
+  --primary-color: #ffaf72; /* Couleur de base personnalisée */
+  --secondary-color: #35495e;
+  --accent-color: #9c27b0;
+  --background-color: #ffffff;
+  --text-color: #333;
+  --heading-font-family: 'Sour Gummy', sans-serif, bold;
+  --body-font-family: 'Montserrat', sans-serif;
+  --heading-font-weight: bold;
+}
