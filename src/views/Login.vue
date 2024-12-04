@@ -1,83 +1,34 @@
 <template>
-    <div class="row q-pa-md">
-      <div class="col-12 col-md-5">
-        <div class="column q-gutter-y-md items-center">
-          <div class="full-width">
-            <q-input
-              v-model="username"
-              label="Username"
-              outlined
-              :dense="dense"
-            />
-          </div>
-          <div class="full-width">
-            <q-input
-              v-model="password"
-              label="Password"
-              type="password"
-              outlined
-              :dense="dense"
-            />
-          </div>
-          <q-btn
-            color="primary"
-            icon="person"
-            label="Login"
-            class="full-width"
-            @click="handleLogin"
-          />
-        </div>
-      </div>
+  <div>
+    <h1>Login</h1>
+    <form @submit.prevent="handleLogin"> <!-- Changé ici de "login" à "handleLogin" -->
+      <input v-model="email" type="text" placeholder="Email" required />
+      <input v-model="password" type="password" placeholder="Password" required />
+      <button type="submit">Login</button>
+    </form>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useFetchApiCrud } from '../composables/useFetchApiCrud'
+
+const email = ref('')
+const password = ref('')
+const router = useRouter()
+const authApi = useFetchApiCrud('users/login', import.meta.env.VITE_API_URL)
+
+async function handleLogin() {
+  const response = await authApi.create({
+    email: email.value,
+    password: password.value
+  })
   
-      <div class="col-12 col-md-2 flex items-center justify-center">
-        <q-separator vertical class="hidden-mobile" />
-        <q-separator horizontal class="mobile-only" >
-          <div class="absolute-center bg-white q-px-sm">OR</div>
-        </q-separator>
-      </div>
-  
-      <div class="col-12 col-md-5 flex items-center justify-center">
-        <q-btn
-          color="positive"
-          icon="person_add"
-          label="Sign Up"
-          class="full-width"
-          @click="handleSignUp"
-        />
-      </div>
-    </div>
-  </template>
-  
-  <script setup>
-  import { ref } from 'vue'
-  import { useRouter } from 'vue-router'
-  import { QInput, QBtn, QSeparator } from 'quasar'
-  
-  const router = useRouter()
-  const username = ref('')
-  const password = ref('')
-  const dense = ref(false)
-  
-  const handleLogin = async () => {
-    console.log('Login attempt:', { username: username.value, password: password.value })
-    router.push('/account')
+  if (response.token) {
+    console.log('Token:', response.token)
+    localStorage.setItem('token', response.token)
+    router.push({ name: 'Home' })
   }
-  
-  const handleSignUp = () => {
-    router.push('/signup')
-  }
-  </script>
-  
-  <style>
-  .mobile-only {
-    display: none;
-  }
-  @media (max-width: 768px) {
-    .mobile-only {
-      display: block;
-    }
-    .hidden-mobile {
-      display: none;
-    }
-  }
-  </style>
+}
+</script>

@@ -1,41 +1,43 @@
 <template>
-  <q-footer bordered class="bg-white text-primary">
-    <q-tabs
-      v-model="tab"
-      class="text-grey-6"
-      active-color="red"
-      indicator-color="var(--accent-color)"
-      align="justify"
-    >
-      <q-tab 
-        name="cocktails" 
-        icon="fa-solid fa-martini-glass-citrus" 
-        label="Cocktails"
+  <footer class="navigation bg-white text-primary">
+    <div class="tabs">
+      <div 
+        class="tab" 
+        :class="{ active: tab === 'cocktails' }" 
         @click="navigateTo('/')"
-      />
+      >
+        <i class="fa-solid fa-martini-glass-citrus"></i>
+        <span>Cocktails</span>
+      </div>
       
-      <q-tab 
-        name="favorites" 
-        icon="fa-solid fa-heart" 
-        label="Favoris"
+      <div 
+        class="tab" 
+        :class="{ active: tab === 'favorites' }" 
         @click="navigateTo('/favorites')"
-      />
+      >
+        <i class="fa-solid fa-heart"></i>
+        <span>Favoris</span>
+      </div>
       
-      <q-tab 
-        name="messages" 
-        icon="fa-solid fa-comments" 
-        label="Messages"
+      <div 
+        class="tab" 
+        :class="{ active: tab === 'chat' }" 
         @click="navigateTo('/chat')"
-      />
+      >
+        <i class="fa-solid fa-comments"></i>
+        <span>Chat</span>
+      </div>
       
-      <q-tab 
-        name="account" 
-        icon="fa-solid fa-user" 
-        label="Compte"
+      <div 
+        class="tab" 
+        :class="{ active: tab === 'account' }" 
         @click="navigateTo('/account')"
-      />
-    </q-tabs>
-  </q-footer>
+      >
+        <i class="fa-solid fa-user"></i>
+        <span>Compte</span>
+      </div>
+    </div>
+  </footer>
 </template>
 
 <script setup>
@@ -46,30 +48,49 @@ const router = useRouter()
 const tab = ref('cocktails')
 
 function navigateTo(route) {
+  tab.value = route === '/' ? 'cocktails' : route.substring(1)
   router.push(route)
 }
 </script>
 
 <style scoped>
+.navigation {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 60px;
+  border-top: 1px solid #ccc;
+  background-color: var(--background-color);
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
 
-q-tab {
+.tabs {
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+}
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+  color: var(--text-color);
+}
+
+.tab.active {
+  color: var(--primary-color);
+}
+
+.tab i {
+  font-size: 20px;
+}
+
+.tab span {
+  font-size: 12px;
   text-transform: none;
 }
-
-.q-footer {
-  height: 60px;
-}
-
-/* Utiliser les variables CSS globales avec des sélecteurs plus spécifiques */
-.q-footer .q-tabs {
-  background-color: var(--background-color) !important;
-}
-
-.q-footer .q-tab__label {
-  text-transform: none !important;
-  color: var(--text-color) !important;
-}
-
-
-
 </style>

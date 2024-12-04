@@ -18,21 +18,31 @@ const routes = [
         name: 'Cocktail',
         component: Cocktail,
         props: true
+        
     },
     {
         path: '/chat',
         name: 'Chat',
         component: Chat,
+        meta: {
+            requiresAuth: true,
+        }
     },
     {
         path: '/favorites',
         name: 'Favorites',
         component: Favorites,
+        meta: {
+            requiresAuth: true,
+        }
     },
     {
         path: '/account',
         name: 'Account',
         component: Account,
+        meta: {
+            requiresAuth: true,
+        }
     },
     {
         path: '/login',
@@ -45,5 +55,21 @@ const router = createRouter({
     history: createWebHistory(),
     routes,
 });
+
+function isAuthenticated() {
+    return !!localStorage.getItem('token');
+  }
+  
+  router.beforeEach((to, from, next) => {
+    if (to.matched.some(record => record.meta.requiresAuth)) {
+      if (!isAuthenticated()) {
+        next({ name: 'Login' });
+      } else {
+        next();
+      }
+    } else {
+      next();
+    }
+  });
 
 export default router;
