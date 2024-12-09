@@ -1,4 +1,5 @@
 <template>
+      <createButton />
   <div class="q-pa-md">
     <div class="text-h3 text-weight page-title q-pa-sm">Cocktails</div>
 
@@ -19,6 +20,7 @@
 <script setup>
 import CocktailCard from '../components/CocktailCard.vue'
 import { useFetchApiCrud } from '../composables/useFetchApiCrud';
+import createButton from '../components/createButton.vue'
 
 const cocktailCrud = useFetchApiCrud('cocktails', import.meta.env.VITE_API_URL);
 const {data: cocktails} = cocktailCrud.readAll();
