@@ -5,6 +5,8 @@ import Favorites from '../views/Favorites.vue';
 import Account from '../views/Account.vue';
 import Login from '../views/Login.vue';
 import Cocktail from '../views/Cocktail.vue';
+import { isAuthenticated } from '../store/user';
+import { is } from 'quasar';
 
 const routes = [
     {
@@ -56,20 +58,20 @@ const router = createRouter({
     routes,
 });
 
-function isAuthenticated() {
-    return !!localStorage.getItem('token');
-  }
-  
-  router.beforeEach((to, from, next) => {
-    if (to.matched.some(record => record.meta.requiresAuth)) {
-      if (!isAuthenticated()) {
-        next({ name: 'Login' });
-      } else {
-        next();
-      }
+router.beforeEach((to, from, next) => {
+  // Vérifie si la route nécessite une authentification
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    // Vérifie si l'utilisateur est authentifié
+    if (!isAuthenticated.value) {
+      next({ name: 'Login' });
     } else {
+      // Continue la navigation si authentifié
       next();
     }
-  });
+  } else {
+    // Continue la navigation si la route ne nécessite pas d'authentification
+    next();
+  }
+});
 
 export default router;
