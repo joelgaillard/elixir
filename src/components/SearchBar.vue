@@ -1,50 +1,76 @@
 <template>
-  <div class="search-bar">
+  <div class="search-container">
     <input 
-      v-model="query" 
-      @input="onSearch" 
-      type="text" 
-      placeholder="Rechercher" 
+      type="text"
+      v-model="searchQuery"
+      placeholder="Rechercher..."
       class="search-input"
     />
-
+    <i class="fa-solid fa-magnifying-glass search-icon"></i>
   </div>
 </template>
 
-<script>
-export default {
-  name: "SearchBar",
-  data() {
-    return {
-      query: ''
-    };
-  },
-  methods: {
-    onSearch() {
-      this.$emit('search', this.query);
+<script setup>
+import { ref, watch } from 'vue'
+import { useFetchApiCrud } from '../composables/useFetchApiCrud'
+
+const searchQuery = ref('')
+const emit = defineEmits(['search-results'])
+const cocktailsApi = useFetchApiCrud('cocktails', import.meta.env.VITE_API_URL)
+
+let timeout = null
+
+watch(searchQuery, (newValue) => {
+  clearTimeout(timeout)
+  timeout = setTimeout(async () => {
+    if (newValue) {
+      try {
+        const response = await cocktailsApi.fetchApi({
+          url: `cocktails?name=${newValue}`,
+          method: 'GET'
+        })
+        // Émet les résultats et la requête actuelle
+        emit('search-results', { cocktails: response.cocktails, pagination: response.pagination }, newValue)
+      } catch (error) {
+        console.error('Erreur lors de la recherche :', error)
+      }
+    } else {
+      emit('reset-search') // Réinitialise la recherche
     }
-  }
-};
+  }, 300)
+})
 </script>
 
 <style scoped>
-.search-bar {
+
+.search-container {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 20px;
+  width: 100%;
+}
+
+  .has-error input {
+  border-color: var(--error);
 }
 
 .search-input {
-  width: 300px;
-  padding: 10px 10px 10px 40px; 
-  border: 1px solid #ccc;
-  border-radius: 50px;
-  font-size: 16px;
-  background: url('../assets/loupe.svg') no-repeat 10px center; 
-  background-size: 20px 20px; 
+  width: 100%;
+    padding: 0.75rem;
+    padding-left: 2.5rem;
+    border: 1px solid #ccc;
+    border-radius: 1.875rem;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s;
 }
 
+.search-input:focus {
+    border-color: var(--primary-color)
+  }
 
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
 </style>

@@ -3,8 +3,13 @@
   --secondary-color: #35495e;
   --accent-color: #9c27b0;
   --background-color: #ffffff;
-  --text-color: #333;
-  --heading-font-family: 'Sour Gummy', sans-serif, bold;
-  --body-font-family: 'Montserrat', sans-serif;
-  --heading-font-weight: bold;
+  --text-color: #000000;
+  --grey: #F6F6F6;
+  --text-color-light: #e6e6e6;
+  --error: #ff0000;
+  --error-dark: #cc0000;
+  --sour-gummy: 'Sour Gummy', sans-serif, bold;
+  --sen: 'Sen', sans-serif;
+  --sen-bold: 'Sen', sans-serif, bold;
+  --bold: bold;
 }

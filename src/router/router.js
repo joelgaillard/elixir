@@ -4,9 +4,9 @@ import Chat from '../views/Chat.vue';
 import Favorites from '../views/Favorites.vue';
 import Account from '../views/Account.vue';
 import Login from '../views/Login.vue';
+import Register from '../views/Register.vue';
 import Cocktail from '../views/Cocktail.vue';
-import { isAuthenticated } from '../store/user';
-import { is } from 'quasar';
+import ChatRoom from '../views/ChatRoom.vue';
 
 const routes = [
     {
@@ -26,52 +26,37 @@ const routes = [
         path: '/chat',
         name: 'Chat',
         component: Chat,
-        meta: {
-            requiresAuth: true,
-        }
+    },
+    {
+        path: '/chat/:id',
+        name: 'ChatRoom',
+        component: ChatRoom,
     },
     {
         path: '/favorites',
         name: 'Favorites',
         component: Favorites,
-        meta: {
-            requiresAuth: true,
-        }
-    },
+        },
     {
         path: '/account',
         name: 'Account',
         component: Account,
-        meta: {
-            requiresAuth: true,
-        }
     },
     {
         path: '/login',
         name: 'Login',
         component: Login,
+    },
+    {
+        path: '/register',
+        name: 'Register',
+        component: Register,
     }
 ];
 
 const router = createRouter({
     history: createWebHistory(),
     routes,
-});
-
-router.beforeEach((to, from, next) => {
-  // Vérifie si la route nécessite une authentification
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    // Vérifie si l'utilisateur est authentifié
-    if (!isAuthenticated.value) {
-      next({ name: 'Login' });
-    } else {
-      // Continue la navigation si authentifié
-      next();
-    }
-  } else {
-    // Continue la navigation si la route ne nécessite pas d'authentification
-    next();
-  }
 });
 
 export default router;

@@ -1,13 +1,37 @@
 /* Redéfinir les styles globaux pour les titres */
 h1, h2, h3, h4, h5, h6 {
-    font-family: var(--heading-font-family);
-    font-weight: var(--heading-font-weight);
+    font-family: var(--sen-bold); /* Utiliser la police de caractères personnalisée */
+    font-weight: var(--bold);
     color: var(--primary-color); /* Utiliser la couleur de base personnalisée */
+    margin-top: 2rem;
+    padding: 0;
+    line-height: 120%;
+
+  }
+
+  h1 {
+    font-size: 2.5rem;
+  }
+
+  h2 {
+    font-size: 2rem;
+  }
+
+  h3 {
+    font-size: 1.75rem;
+  }
+
+  h4 {
+    font-size: 1.5rem;
+  }
+
+  h5 {
+    font-size: 1.25rem;
   }
   
   /* Redéfinir les styles globaux pour le corps */
   body {
-    font-family: var(--body-font-family);
+    font-family: var(--sen); /* Utiliser la police de caractères personnalisée */
     background-color: var(--background-color);
     color: var(--text-color);
   }

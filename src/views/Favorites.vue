@@ -1,65 +1,66 @@
 <template>
-  <div class="q-pa-md">
-    <div class="text-h3 text-weight page-title q-pa-sm">Cocktails</div>
-
-    <div class="row q-col-gutter-md">
-      <div v-for="cocktail in cocktails" 
-           :key="cocktail._id" 
-           class="col-12 col-xs-6 col-sm-4 col-md-3">
-        <CocktailCard 
-        :id="cocktail._id"
-          :name="cocktail.name"
-          :image="cocktail.image_url"
-        />
+  <div v-if="isAuthenticated">
+    <h1>Favoris</h1>
+    <div class="cocktail-grid">
+      <div v-for="cocktail in cocktails" :key="cocktail._id" class="cocktail-card">
+        <CocktailCard @remove-favorite="removeFavorite" :id="cocktail._id" :name="cocktail.name"
+          :image="cocktail.image_url" :rank="cocktail.rank" :ratings-count="cocktail.ratingsCount" />
       </div>
     </div>
   </div>
+  <ConnectionLanding activeIcon="fa-solid fa-heart" v-else />
 </template>
 
 <script setup>
 import CocktailCard from '../components/CocktailCard.vue'
+import ConnectionLanding from '../components/ConnectionLanding.vue'
 import { useFetchApiCrud } from '../composables/useFetchApiCrud';
+import { isAuthenticated } from '../store/user';
+
 
 const favoritesCrud = useFetchApiCrud('users/me/favorites', import.meta.env.VITE_API_URL);
-const {data: cocktails} = favoritesCrud.readAll();
+const { data: cocktails } = favoritesCrud.readAll();
+
+function removeFavorite(id) {
+  cocktails.value = cocktails.value.filter(cocktail => cocktail._id !== id);
+}
 
 </script>
 
 <style scoped>
-.page-title {
-  font-family: var(--heading-font-family);
-}
-/* Style pour maintenir les proportions des cartes */
-.row {
-  display: flex;
-  flex-wrap: wrap;
+.cocktail-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1rem;
 }
 
-/* Mobile petit (< 400px) : 1 carte */
-@media (max-width: 399px) {
-  .col-12 {
-    width: 100%;
-  }
-}
 
-/* Mobile grand/Tablette portrait (400px - 767px) : 2 cartes */
+
+/* Mobile grand/Tablette portrait (400px - 767px) : 2 colonnes */
 @media (min-width: 400px) and (max-width: 767px) {
-  .col-xs-6 {
-    width: 50%;
+  .cocktail-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
-/* Tablette/Petit desktop (768px - 1023px) : 3 cartes */
+/* Tablette/Petit desktop (768px - 1023px) : 3 colonnes */
 @media (min-width: 768px) and (max-width: 1023px) {
-  .col-sm-4 {
-    width: 33.333%;
+  .cocktail-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
-/* Grand desktop (≥ 1024px) : 4 cartes */
-@media (min-width: 1024px) {
-  .col-md-3 {
-    width: 25%;
+/* Desktop (1024px - 1439px) : 4 colonnes */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .cocktail-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Grand desktop (≥ 1440px) : 6 colonnes */
+@media (min-width: 1440px) {
+  .cocktail-grid {
+    grid-template-columns: repeat(6, 1fr);
   }
 }
 </style>

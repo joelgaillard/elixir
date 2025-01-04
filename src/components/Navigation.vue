@@ -42,15 +42,21 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
+const route = useRoute();
 const tab = ref('cocktails')
 
 function navigateTo(route) {
   tab.value = route === '/' ? 'cocktails' : route.substring(1)
   router.push(route)
 }
+
+const isActive = (path) => {
+  return route.path === path;
+};
+
 </script>
 
 <style scoped>

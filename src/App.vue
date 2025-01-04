@@ -1,10 +1,14 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-page-container>
+  <div id="app">
+    <header>
+    </header>
+    <main>
       <router-view />
-    </q-page-container>
-    <Navigation />
-  </q-layout>
+    </main>
+    <footer>
+      <Navigation/>
+    </footer>
+  </div>
 </template>
 
 <script setup>
@@ -12,4 +16,15 @@ import Navigation from './components/Navigation.vue'
 </script>
 
 <style>
+#app {
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  padding-left: 5%;
+  padding-right: 5%;
+  padding-top: 1rem;
+  padding-bottom: 4rem;
+}
 </style>
