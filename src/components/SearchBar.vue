@@ -44,8 +44,9 @@ watch(searchQuery, (newValue) => {
 <style scoped>
 
 .search-container {
+  display: flex;
+  align-items: center;
   position: relative;
-  width: 100%;
 }
 
   .has-error input {
