@@ -4,7 +4,7 @@
     <div class="infos-container">
       <div class="infos">
         <div class="title">{{ name }}</div>
-        <div class="rating"> <i class="fa-solid fa-star"></i> {{ rank }}/5 ({{ ratingsCount }}) </div>
+        <div class="rating"> <i class="fa-solid fa-star"></i> {{ roundRank(rank) }}/5 ({{ ratingsCount }}) </div>
       </div>
       <div class="favorite">
         <i :class="favoriteIcon" @click.stop="toggleFavorite" @mouseover="isHovered = true"
@@ -64,11 +64,15 @@ const favoritesApi = useFetchApiCrud('users/me/favorites', import.meta.env.VITE_
 
 const checkFavorite = async () => {
   if (isAuthenticated.value) {
-    const response = await favoritesApi.fetchApi({
-      url: `users/me/favorites/${props.id}/check`,
-      method: 'GET'
-    })
-    isFavorite.value = response.isFavorite
+    try {
+      const response = await favoritesApi.fetchApi({
+        url: `users/me/favorites/${props.id}`,
+        method: 'GET'
+      })
+      isFavorite.value = !!response._id
+    }
+    catch (e) {
+    }
   }
 }
 
@@ -97,6 +101,11 @@ const toggleFavorite = async () => {
   }
 
 }
+
+function roundRank(rank) {
+  return Math.round(rank * 10) / 10;
+}
+
 
 
 onMounted(checkFavorite)
@@ -166,4 +175,4 @@ const goToCocktailDetail = () => {
     font-size: 2rem;
   }
 }
-</style>
+</style>0

@@ -84,7 +84,7 @@ async function handleLogin() {
             router.back()
         }
     } catch (e) {
-        errors.value = e.data?.errors || []
+        errors.value = e.data?.errors || [{ field: 'email', msg: 'Erreur interne du serveur' }, { field: 'password', msg: 'Erreur interne du serveur' }]
         console.error('Erreur:', e)
     }
 }

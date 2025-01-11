@@ -83,7 +83,6 @@ async function fetchCocktails() {
     totalPages.value = data.pagination.totalPages
   } catch (e) {
     error.value = true
-    console.error('Erreur lors de la récupération des cocktails:', e)
   }
 }
 
@@ -95,7 +94,6 @@ async function fetchIngredients() {
     })
     ingredients.value = data;
   } catch (e) {
-    console.error('Erreur lors de la récupération des ingrédients:', e)
   }
 }
 

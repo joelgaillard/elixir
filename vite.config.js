@@ -1,13 +1,14 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
+import basicSsl from '@vitejs/plugin-basic-ssl'
 
 
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [basicSsl(), vue()],
   server: {
     proxy : {
       '/api/': {
-        target: 'http://localhost:3000/',
+        target: 'https://elixir-api-st9s.onrender.com/',
         changeOrigin: true,
       }
     },

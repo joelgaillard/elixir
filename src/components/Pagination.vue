@@ -15,7 +15,7 @@
   </template>
   
   <script setup>
-  import { ref, computed, watch } from 'vue';
+  import { computed } from 'vue';
   
   const props = defineProps({
     currentPage: {
@@ -97,7 +97,8 @@
   .pagination-number {
     padding: 0.5rem 1rem;
     background-color: var(--color-background);
-    border-radius: 100%;
+    border-radius: 80rem;
+    aspect-ratio: 1;
     border: none;
     cursor: pointer;
     color: var(--primary-color);

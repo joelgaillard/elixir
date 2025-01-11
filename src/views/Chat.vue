@@ -7,13 +7,13 @@
           <Bar :id="bar._id" :name="bar.name" :image="bar.image_url" />
         </div>
       </div>
-      <div class="no-bar" v-else>
+      <div class="no-bar" v-else-if="!isLoading || fetchError">
         <i class="fa-solid fa-location-dot fa-10x"></i>
         <h2>Aucun salon de discussion trouvé à proximité, réessayez à un autre endroit.</h2>
         <Button text="Retour à la page d'accueil" icon="fa-solid fa-martini-glass-citrus" @click="navigateTo('/')"/>
       </div>
     </div>
-    <EnableLocation v-else activeIcon="fa-solid fa-location-arrow" />
+    <EnableLocation v-else-if="!isLoading" activeIcon="fa-solid fa-location-arrow" />
   </div>
   <ConnectionLanding activeIcon="fa-solid fa-comments" v-else />
 </template>
@@ -34,7 +34,7 @@ const { coords, locationError, locationReady } = useLocationStore()
 // Initialisation
 const router = useRouter();
 const barCrud = useFetchApiCrud('bars', import.meta.env.VITE_API_URL);
-const isLoading = ref(false);
+const isLoading = ref(true);
 const bars = ref([]);
 const fetchError = ref(false);
 
@@ -67,8 +67,11 @@ const fetchBars = async () => {
 watchEffect(async () => {
   const { latitude, longitude } = coords.value;
   console.log('Watch coords:', coords.value);
-  if (isAuthenticated.value && latitude && longitude) {
+  if (isAuthenticated.value && latitude!==null && longitude!==null) {
+    isLoading.value = true;
     await fetchBars();
+  } else {
+    isLoading.value = false;
   }
 });
 

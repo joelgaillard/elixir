@@ -18,11 +18,11 @@
             <TextInput v-model="password" type="password" placeholder="PasswordSecure123!" />
             <div v-if="getError('password')" class="error-message">{{ getError('password') }}</div>
         </div>
-        <div class="register-element" :class="{ 'has-error': hasError('confirmpassword') }">
-            <label for="confirmpassword">Confirmation du mot de passe</label>
-            <TextInput v-model="confirmpassword" type="password" placeholder="PasswordSecure123!" />
-            <div v-if="getError('confirmpassword')" class="error-message">{{ getError('confirmpassword') }}</div>
-        </div>
+        <div class="register-element" :class="{ 'has-error': hasError('confirmPassword') }">
+    <label for="confirmPassword">Confirmation du mot de passe</label>
+    <TextInput v-model="confirmPassword" type="password" placeholder="PasswordSecure123!" />
+    <div v-if="getError('confirmPassword')" class="error-message">{{ getError('confirmPassword') }}</div>
+  </div>
         <div class="register-element buttons">
             <Button text="S'inscrire et se connecter" />
             <div>Vous avez déjà un compte? <router-link to="/login">Connexion</router-link></div>
@@ -58,12 +58,11 @@ function getError(field) {
 }
 
 async function handleRegister() {
-    if (password.value !== confirmPassword.value) {
-    errors.value = [{ field: 'confirmpassword', msg: 'Les mots de passe ne correspondent pas' }]
+    errors.value = []
+  if (password.value !== confirmPassword.value) {
+    errors.value = [{ field: 'confirmPassword', msg: 'Les mots de passe ne correspondent pas' }]
     return
-  } else {
-    errors.value = errors.value.filter(error => error.field !== 'confirmpassword')
-  }
+  } 
     const response = await usersApi.fetchApi({
         url: 'users',
         data: {
