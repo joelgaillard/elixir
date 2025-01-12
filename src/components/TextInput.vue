@@ -41,6 +41,7 @@
     font-size: 1rem;
     outline: none;
     transition: border-color 0.3s;
+    box-sizing: border-box;
   }
   
   .text-input:focus {
