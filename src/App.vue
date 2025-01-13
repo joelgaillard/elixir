@@ -24,7 +24,7 @@ import Navigation from './components/Navigation.vue'
 main {
   padding-left: 5%;
   padding-right: 5%;
-  padding-top: 1rem;
+  padding-top:0;
   padding-bottom: 4rem;
 }
 </style>

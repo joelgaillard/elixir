@@ -199,7 +199,7 @@ onMounted(() => {
 .pagination {
   display: flex;
   justify-content: center;
-  margin-top: 20px;
+  margin-top: 2rem;
 }
 
 .pagination button {
