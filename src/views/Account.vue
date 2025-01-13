@@ -131,13 +131,24 @@ const showPasswordChange = ref(false)
 const showDelete = ref(false)
 
 const hasChanges = computed(() => {
+  const passwordsFilled =
+    passwords.value.currentPassword &&
+    passwords.value.newPassword &&
+    passwords.value.confirmNewPassword;
+
+  const passwordsEmpty =
+    !passwords.value.currentPassword &&
+    !passwords.value.newPassword &&
+    !passwords.value.confirmNewPassword;
+
+  const usernameChanged = userInfo.value.username !== originalUserInfo.value.username;
+  const emailChanged = userInfo.value.email !== originalUserInfo.value.email;
+
   return (
-    userInfo.value.username !== originalUserInfo.value.username ||
-    userInfo.value.email !== originalUserInfo.value.email ||
-    passwords.value.newPassword ||
-    passwords.value.confirmNewPassword
-  )
-})
+    passwordsFilled || // Tous les champs de mot de passe sont remplis (on modifie le mot de passe)
+    (passwordsEmpty && (usernameChanged || emailChanged)) // Aucun champ de mot de passe n'est rempli et au moins un autre champ est modifié
+  );
+});
 
 const hasDeleteChanges = computed(() => {
   return deletePasswords.value.password || deletePasswords.value.confirmPassword
@@ -198,7 +209,6 @@ async function verifyPassword(password, field) {
 
 async function handleSave() {
 
-  // Vérifier le mot de passe actuel si modification demandée
 
   if (passwords.value.newPassword && !passwords.value.currentPassword) {
     errors.value = [{ 

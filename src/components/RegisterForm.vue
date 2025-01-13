@@ -1,7 +1,7 @@
 <template>
     <form @submit.prevent="handleRegister">
         <div class="register-element title">
-        <h1>Inscription</h1>
+            <h1>Inscription</h1>
         </div>
         <div class="register-element" :class="{ 'has-error': hasError('username') }">
             <label for="username">Nom d'utilisateur</label>
@@ -19,10 +19,10 @@
             <div v-if="getError('password')" class="error-message">{{ getError('password') }}</div>
         </div>
         <div class="register-element" :class="{ 'has-error': hasError('confirmPassword') }">
-    <label for="confirmPassword">Confirmation du mot de passe</label>
-    <TextInput v-model="confirmPassword" type="password" placeholder="PasswordSecure123!" />
-    <div v-if="getError('confirmPassword')" class="error-message">{{ getError('confirmPassword') }}</div>
-  </div>
+            <label for="confirmPassword">Confirmation du mot de passe</label>
+            <TextInput v-model="confirmPassword" type="password" placeholder="PasswordSecure123!" />
+            <div v-if="getError('confirmPassword')" class="error-message">{{ getError('confirmPassword') }}</div>
+        </div>
         <div class="register-element buttons">
             <Button text="S'inscrire et se connecter" />
             <div>Vous avez déjà un compte? <router-link to="/login">Connexion</router-link></div>
@@ -49,20 +49,20 @@ const router = useRouter()
 const usersApi = useFetchApiCrud('users', import.meta.env.VITE_API_URL)
 
 function hasError(field) {
-  return errors.value.some(error => error.field === field)
+    return errors.value.some(error => error.field === field)
 }
 
 function getError(field) {
-  const error = errors.value.find(error => error.field === field)
-  return error ? error.msg : null
+    const error = errors.value.find(error => error.field === field)
+    return error ? error.msg : null
 }
 
 async function handleRegister() {
     errors.value = []
-  if (password.value !== confirmPassword.value) {
-    errors.value = [{ field: 'confirmPassword', msg: 'Les mots de passe ne correspondent pas' }]
-    return
-  } 
+    if (password.value !== confirmPassword.value) {
+        errors.value = [{ field: 'confirmPassword', msg: 'Les mots de passe ne correspondent pas' }]
+        return
+    }
     const response = await usersApi.fetchApi({
         url: 'users',
         data: {
@@ -77,14 +77,30 @@ async function handleRegister() {
     })
 
     if (response?.token) {
-        console.log('Data:', response)
-        console.log('Token:', response.token)
         setDefaultHeaders({ Authorization: `Bearer ${response.token}` })
-        user.value = userData
+
+        await new Promise(resolve => setTimeout(resolve, 100))
+
+        const userData = await usersApi.fetchApi({
+                url: 'users/me',
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${response.token}`
+                }
+            })
+
+            user.value = userData
             isAuthenticated.value = true
             token.value = response.token
+
+
+
+
+        console.log('Data:', response)
+        console.log('Token:', response.token)
+        isAuthenticated.value = true
+        router.go(-2)
         
-        router.push({ name: 'Home' })
     }
 }
 
@@ -120,8 +136,4 @@ label {
     gap: 2rem;
     justify-content: center;
 }
-
-
-
-
 </style>
