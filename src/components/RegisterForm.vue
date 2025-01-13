@@ -31,13 +31,13 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import TextInput from './TextInput.vue'
 import Button from './Button.vue'
 import { useRouter } from 'vue-router'
 import { useFetchApiCrud } from '../composables/useFetchApiCrud'
 import { setDefaultHeaders } from '../composables/useFetchApi'
-import { isAuthenticated } from '../store/user'
+import {user, token, isAuthenticated} from '../store/user'
 
 const username = ref('')
 const email = ref('')
@@ -80,7 +80,10 @@ async function handleRegister() {
         console.log('Data:', response)
         console.log('Token:', response.token)
         setDefaultHeaders({ Authorization: `Bearer ${response.token}` })
-        isAuthenticated.value = true
+        user.value = userData
+            isAuthenticated.value = true
+            token.value = response.token
+        
         router.push({ name: 'Home' })
     }
 }
