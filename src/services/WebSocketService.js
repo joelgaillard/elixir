@@ -1,6 +1,6 @@
 class ChatService {
   constructor(barId, userid, token, coords) {
-    const wsUrl = `wss://elixir-api-st9s.onrender.com:3000/api?barId=${barId}&userId=${userid}&token=${token}&lat=${coords.latitude}&lng=${coords.longitude}`;
+    const wsUrl = `wss://elixir-api-st9s.onrender.com?barId=${barId}&userId=${userid}&token=${token}&lat=${coords.latitude}&lng=${coords.longitude}`;
     console.log('WebSocket URL:', wsUrl); // Log pour vérifier l'URL
     this.ws = new WebSocket(wsUrl);
     this.connected = false;
