@@ -59,9 +59,7 @@ const fetchBarInfo = async () => {
       method: 'GET',
     });
     bar.value = response; // Assignez directement l'objet reçu à `bar.value`
-    console.log('Bar récupéré:', bar.value);
   } catch (e) {
-    console.error('Erreur fetchBarInfo:', e);
   }
 };
 
@@ -71,11 +69,9 @@ const fetchMessages = async () => {
       url: `bars/${route.params.id}/messages?lat=${coords.value.latitude}&lng=${coords.value.longitude}`,
       method: 'GET',
     });
-    console.log('Messages récupérés :', response);
     messages.value = response;
     scrollToBottom();
   } catch (error) {
-    console.error('Erreur lors de la récupération des messages :', error);
   }
 };
 

@@ -7,9 +7,9 @@
   </template>
   
   <script setup>
-  import { defineProps } from 'vue'
   import Button from './Button.vue'
-  import { useRouter } from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
+
   
   const props = defineProps({
     activeIcon: {
@@ -18,11 +18,19 @@
     }
   })
   
+  const route = useRoute()
   const router = useRouter()
   
-  function navigateTo(route) {
-    router.push(route)
+  function navigateTo(routePath) {
+  if (routePath === '/login' || routePath === '/register') {
+    router.push({
+      path: routePath,
+      query: { redirect: route.fullPath },
+    })
+  } else {
+    router.push(routePath)
   }
+}
   </script>
 
 <style scoped>
@@ -31,7 +39,7 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 5rem;
+    gap: 3rem;
     padding-left: 5%;
     padding-right: 5%;
 }

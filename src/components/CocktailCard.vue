@@ -7,8 +7,9 @@
         <div class="rating"> <i class="fa-solid fa-star"></i> {{ roundRank(rank) }}/5 ({{ ratingsCount }}) </div>
       </div>
       <div class="favorite">
-        <i :class="favoriteIcon" @click.stop="toggleFavorite" @mouseover="isHovered = true"
-          @mouseleave="isHovered = false"></i>
+        <i :class="favoriteIcon" @click.stop="toggleFavorite"
+          @mouseover="!isMobile && (isHovered = true)"
+          @mouseleave="!isMobile && (isHovered = false)"></i>
       </div>
     </div>
   </div>
@@ -21,11 +22,14 @@ import { ref, computed, onMounted } from 'vue'
 import { useFetchApiCrud } from '../composables/useFetchApiCrud'
 import { isAuthenticated } from '../store/user'
 
-
 const router = useRouter()
 const isHovered = ref(false)
 const isFavorite = ref(false)
+const isMobile = ref(false)
 
+onMounted(() => {
+  isMobile.value = /Mobi|Android/i.test(navigator.userAgent)
+})
 
 // Définition des props avec validation
 const props = defineProps({
@@ -43,13 +47,11 @@ const props = defineProps({
   },
   rank: {
     type: Number,
-    required: false,
-    default: 0
+    required: true
   },
   ratingsCount: {
     type: Number,
-    required: false,
-    default: 0
+    required: true
   }
 })
 
@@ -175,4 +177,4 @@ const goToCocktailDetail = () => {
     font-size: 2rem;
   }
 }
-</style>0
+</style>

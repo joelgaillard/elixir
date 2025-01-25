@@ -3,34 +3,34 @@
     <div class="tabs">
       <div 
         class="tab" 
-        :class="{ active: tab === 'cocktails' }" 
+        :class="{ active: isActive('/') || isChildActive('/cocktails') }" 
         @click="navigateTo('/')"
       >
         <i class="fa-solid fa-martini-glass-citrus"></i>
         <span>Cocktails</span>
       </div>
-      
+
       <div 
         class="tab" 
-        :class="{ active: tab === 'favorites' }" 
+        :class="{ active: isActive('/favorites') }" 
         @click="navigateTo('/favorites')"
       >
         <i class="fa-solid fa-heart"></i>
         <span>Favoris</span>
       </div>
-      
+
       <div 
         class="tab" 
-        :class="{ active: tab === 'chat' }" 
+        :class="{ active: isActive('/chat') || isChildActive('/chat') }" 
         @click="navigateTo('/chat')"
       >
         <i class="fa-solid fa-comments"></i>
         <span>Chat</span>
       </div>
-      
+
       <div 
         class="tab" 
-        :class="{ active: tab === 'account' }" 
+        :class="{ active: isActive('/account') }" 
         @click="navigateTo('/account')"
       >
         <i class="fa-solid fa-user"></i>
@@ -41,21 +41,29 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { watch } from 'vue'
 
 const router = useRouter()
-const route = useRoute();
-const tab = ref('cocktails')
+const route = useRoute()
 
-function navigateTo(route) {
-  tab.value = route === '/' ? 'cocktails' : route.substring(1)
-  router.push(route)
+// Fonction de navigation
+function navigateTo(routePath) {
+  if (route.path !== routePath) {
+    router.push(routePath)
+  }
 }
 
-const isActive = (path) => {
-  return route.path === path;
-};
+// Vérifie si la route est strictement active
+function isActive(path) {
+  return route.path === path
+}
+
+// Vérifie si une route enfant est active (pour les routes dynamiques comme "/cocktails/:id" ou "/chat/:id")
+function isChildActive(basePath) {
+  return route.path.startsWith(basePath)
+}
+
 
 </script>
 
@@ -64,7 +72,7 @@ const isActive = (path) => {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  height: 60px;
+  height: 3.75rem;
   border-top: 1px solid #ccc;
   background-color: var(--background-color);
   position: fixed;
@@ -82,21 +90,21 @@ const isActive = (path) => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 10px;
   cursor: pointer;
   color: var(--text-color);
 }
 
 .tab.active {
   color: var(--primary-color);
+  font-weight: bold;
 }
 
 .tab i {
-  font-size: 20px;
+  font-size: 1.25rem;
 }
 
 .tab span {
-  font-size: 12px;
+  font-size: 0.75rem;
   text-transform: none;
 }
 </style>

@@ -7,7 +7,6 @@
 
 
 <script setup>
-import { defineProps, defineEmits } from 'vue'
 
 const props = defineProps({
   text: {
@@ -30,9 +29,7 @@ function handleClick(event) {
 
 <style scoped>
 button {
-  padding: 0.75rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
+  padding: 0.5rem 1rem;
   border-radius: 1.875rem;
   background-color: var(--primary-color);
   color: var(--background-color);

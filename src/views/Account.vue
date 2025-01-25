@@ -9,17 +9,19 @@
       <div class="form-element" :class="{ 'has-error': hasError('username') }">
         <label for="username">Nom d'utilisateur</label>
         <div class="input-container">
-          <TextInput v-model="userInfo.username" placeholder="Nom d'utilisateur" class="text-input" :readonly="!isEditing.username" />
+          <TextInput v-model="userInfo.username" placeholder="Nom d'utilisateur" class="text-input"
+            :readonly="!isEditing.username" />
           <i v-if="!isEditing.username" class="fa-solid fa-pen edit-icon" @click="editField('username')"></i>
           <i v-else class="fa-solid fa-xmark cancel-icon" @click="cancelEdit('username')"></i>
         </div>
-          <div v-if="getError('username')" class="error-message">{{ getError('username') }}</div>
+        <div v-if="getError('username')" class="error-message">{{ getError('username') }}</div>
       </div>
 
       <div class="form-element" :class="{ 'has-error': hasError('email') }">
         <label for="email">Email</label>
         <div class="input-container">
-          <TextInput v-model="userInfo.email" type="email" placeholder="Email" class="text-input" :readonly="!isEditing.email" />
+          <TextInput v-model="userInfo.email" type="email" placeholder="Email" class="text-input"
+            :readonly="!isEditing.email" />
           <i v-if="!isEditing.email" class="fa-solid fa-pen edit-icon" @click="editField('email')"></i>
           <i v-else class="fa-solid fa-xmark cancel-icon" @click="cancelEdit('email')"></i>
         </div>
@@ -35,27 +37,30 @@
         <div class="form-element" :class="{ 'has-error': hasError('currentPassword') }">
           <label for="currentPassword">Mot de passe actuel</label>
           <div class="input-container">
-          <TextInput v-model="passwords.currentPassword" type="password" placeholder="Mot de passe actuel" class="text-input" />
+            <TextInput v-model="passwords.currentPassword" type="password" placeholder="Mot de passe actuel"
+              class="text-input" />
           </div>
           <div v-if="getError('currentPassword')" class="error-message">{{ getError('currentPassword') }}</div>
         </div>
         <div class="form-element" :class="{ 'has-error': hasError('password') }">
           <label for="newPassword">Nouveau mot de passe</label>
           <div class="input-container">
-          <TextInput v-model="passwords.newPassword" type="password" placeholder="Nouveau mot de passe" class="text-input" />
+            <TextInput v-model="passwords.newPassword" type="password" placeholder="Nouveau mot de passe"
+              class="text-input" />
           </div>
           <div v-if="getError('password')" class="error-message">{{ getError('password') }}</div>
         </div>
         <div class="form-element" :class="{ 'has-error': hasError('confirmNewPassword') || hasError('password') }">
           <label for="confirmNewPassword">Confirmer le nouveau mot de passe</label>
           <div class="input-container">
-          <TextInput v-model="passwords.confirmNewPassword" type="password" placeholder="Confirmer le nouveau mot de passe" class="text-input" />
+            <TextInput v-model="passwords.confirmNewPassword" type="password"
+              placeholder="Confirmer le nouveau mot de passe" class="text-input" />
           </div>
           <div v-if="getError('confirmNewPassword')" class="error-message">{{ getError('confirmNewPassword') }}</div>
         </div>
       </div>
       <div class="form-element buttons">
-        <Button v-if="hasChanges" class="button" text="Enregistrer les modifications" type="submit" />
+        <Button :disabled="!hasChanges" class="button" text="Enregistrer les modifications" type="submit" />
       </div>
     </form>
 
@@ -69,22 +74,26 @@
         <div class="form-element" :class="{ 'has-error': hasError('deletePassword') }">
           <label for="deletePassword">Mot de passe</label>
           <div class="input-container">
-          <TextInput v-model="deletePasswords.password" type="password" placeholder="Mot de passe" class="text-input" />
+            <TextInput v-model="deletePasswords.password" type="password" placeholder="Mot de passe"
+              class="text-input" />
           </div>
           <div v-if="getError('deletePassword')" class="error-message">{{ getError('deletePassword') }}</div>
         </div>
         <div class="form-element" :class="{ 'has-error': hasError('confirmDeletePassword') }">
           <label for="confirmDeletePassword">Confirmer le mot de passe</label>
           <div class="input-container">
-          <TextInput v-model="deletePasswords.confirmPassword" type="password" placeholder="Confirmer le mot de passe" class="text-input" />
+            <TextInput v-model="deletePasswords.confirmPassword" type="password" placeholder="Confirmer le mot de passe"
+              class="text-input" />
           </div>
-          <div v-if="getError('confirmDeletePassword')" class="error-message">{{ getError('confirmDeletePassword') }}</div>
+          <div v-if="getError('confirmDeletePassword')" class="error-message">{{ getError('confirmDeletePassword') }}
+          </div>
         </div>
         <div class="form-element buttons">
-          <Button v-if="hasDeleteChanges" class="button delete" text="Supprimer le compte" type="submit" />
+          <Button :disabled="!hasDeleteChanges" class="button delete" text="Supprimer le compte" type="submit" />
         </div>
       </form>
     </div>
+    <Status v-if="showStatus" message="Vos informations personnelles ont été mises à jour" type="success" class="status-message" />
   </div>
   <ConnectionLanding activeIcon="fa-solid fa-user" v-else />
 </template>
@@ -98,6 +107,7 @@ import TextInput from '../components/TextInput.vue'
 import { setDefaultHeaders } from '../composables/useFetchApi'
 import { isAuthenticated, user, token } from '../store/user'
 import { useFetchApiCrud } from '../composables/useFetchApiCrud'
+import Status from '../components/Status.vue'
 
 const router = useRouter()
 
@@ -151,8 +161,12 @@ const hasChanges = computed(() => {
 });
 
 const hasDeleteChanges = computed(() => {
-  return deletePasswords.value.password || deletePasswords.value.confirmPassword
-})
+  return (
+    deletePasswords.value.password && 
+    deletePasswords.value.confirmPassword
+  );
+});
+
 
 function togglePasswordChange() {
   showPasswordChange.value = !showPasswordChange.value
@@ -184,7 +198,7 @@ async function verifyPassword(password, field) {
     const response = await authApi.fetchApi({
       url: 'users/login',
       data: {
-        email: originalUserInfo.value.email,
+        email: user.value.email,
         password: password
       },
       method: 'POST'
@@ -192,17 +206,11 @@ async function verifyPassword(password, field) {
 
     return response?.token
   } catch (e) {
-    if (e.data?.errors) {
-      errors.value = e.data.errors.map(err => ({
-        field: field,
-        msg: err.msg
-      }))
-    } else {
+   
       errors.value = [{
         field: field,
         msg: 'Mot de passe incorrect.'
       }]
-    }
     return null
   }
 }
@@ -211,9 +219,9 @@ async function handleSave() {
 
 
   if (passwords.value.newPassword && !passwords.value.currentPassword) {
-    errors.value = [{ 
-      field: 'currentPassword', 
-      msg: 'Veuillez entrer votre mot de passe actuel.' 
+    errors.value = [{
+      field: 'currentPassword',
+      msg: 'Veuillez entrer votre mot de passe actuel.'
     }]
     return
   }
@@ -228,20 +236,20 @@ async function handleSave() {
 
 
   if (passwords.value.newPassword && !passwords.value.confirmNewPassword) {
-  errors.value = [{ 
-    field: 'confirmNewPassword', 
-    msg: 'Veuillez confirmer votre nouveau mot de passe.' 
-  }]
-  return
-}
+    errors.value = [{
+      field: 'confirmNewPassword',
+      msg: 'Veuillez confirmer votre nouveau mot de passe.'
+    }]
+    return
+  }
 
-if (!passwords.value.newPassword && passwords.value.confirmNewPassword) {
-  errors.value = [{ 
-    field: 'newPassword', 
-    msg: 'Veuillez entrer votre nouveau mot de passe.' 
-  }]
-  return
-}
+  if (!passwords.value.newPassword && passwords.value.confirmNewPassword) {
+    errors.value = [{
+      field: 'newPassword',
+      msg: 'Veuillez entrer votre nouveau mot de passe.'
+    }]
+    return
+  }
 
   // Vérifier les mots de passe s'ils sont différents
   if (passwords.value.newPassword && passwords.value.newPassword !== passwords.value.confirmNewPassword) {
@@ -256,68 +264,90 @@ if (!passwords.value.newPassword && passwords.value.confirmNewPassword) {
   if (passwords.value.newPassword) updates.password = passwords.value.newPassword
 
   try {
-  const response = await fetch('/api/users/me', {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token.value}`,
-    },
-    body: JSON.stringify(updates),
-  });
+    const response = await fetch('/api/users/me', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token.value}`,
+      },
+      body: JSON.stringify(updates),
+    });
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    console.error('Erreur lors de la mise à jour:', errorData);
+    if (!response.ok) {
+      const errorData = await response.json();
 
-    // Stocker les erreurs dans un format compatible avec getError
-    if (errorData.errors) {
-      errors.value = errorData.errors.map(err => ({
-        field: err.field,
-        msg: err.msg,
-      }));
-    } else {
-      errors.value = [{ field: 'global', msg: 'Une erreur est survenue.' }];
+      // Stocker les erreurs dans un format compatible avec getError
+      if (errorData.errors) {
+        errors.value = errorData.errors.map(err => ({
+          field: err.field,
+          msg: err.msg,
+        }));
+      } else {
+        errors.value = [{ field: 'global', msg: 'Une erreur est survenue.' }];
+      }
+      return;
     }
-    return;
+
+    const data = await response.json();
+
+// Ne mettez à jour que les champs retournés par l'API
+if (data.user.username) user.value.username = data.user.username;
+if (data.user.email) user.value.email = data.user.email;
+
+// Synchronisez aussi les champs locaux
+if (data.user.username) userInfo.value.username = data.user.username;
+if (data.user.email) userInfo.value.email = data.user.email;
+
+displayStatus();
+    resetState();
+  } catch (error) {
+    errors.value = [{ field: 'global', msg: 'Erreur lors de la mise à jour des informations utilisateur.' }];
+  }
+}
+
+async function handleDeleteAccount() {
+  errors.value = []; // Réinitialiser les erreurs
+
+  // Vérifier si les champs sont vides
+  if (!deletePasswords.value.password) {
+    errors.value.push({ field: 'deletePassword', msg: 'Le mot de passe est requis.' });
+  }
+  if (!deletePasswords.value.confirmPassword) {
+    errors.value.push({ field: 'confirmDeletePassword', msg: 'Veuillez confirmer le mot de passe.' });
   }
 
-  const data = await response.json();
-  user.value.username = data.user.username;
-  user.value.email = data.user.email;
-
-  resetState();
-} catch (error) {
-  console.error('Erreur lors de la mise à jour:', error);
-  errors.value = [{ field: 'global', msg: 'Erreur lors de la mise à jour des informations utilisateur.' }];
-}
-}
-
-async function handleDeleteAccount(deletePasswords) {
+  // Vérifier que les mots de passe correspondent
   if (deletePasswords.value.password !== deletePasswords.value.confirmPassword) {
-    errors.value = [{ field: 'confirmDeletePassword', msg: 'Les mots de passe ne correspondent pas.' }]
-    return
+    errors.value.push({
+      field: 'confirmDeletePassword',
+      msg: 'Les mots de passe ne correspondent pas.'
+    });
   }
 
+  // Si des erreurs sont présentes, stoppez l'exécution
+  if (errors.value.length > 0) return;
+
+  // Validation du mot de passe via l'API
   if (deletePasswords.value.password) {
-    const token = await verifyPassword(deletePasswords.value.password, 'deletePassword')
-    if (!token) return
+    const token = await verifyPassword(deletePasswords.value.password, 'deletePassword');
+    if (!token) return; // La méthode `verifyPassword` ajoutera ses propres erreurs si elle échoue
   }
-
 
   try {
-
     await fetch('/api/users/me', {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${response.token}`
+        Authorization: `Bearer ${token.value}`,
       }
-    })
+    });
 
-    handleLogout()
+    handleLogout(); // Suppression réussie
   } catch (error) {
-    console.error('Erreur lors de la suppression du compte:', error)
-    errors.value = [{ field: 'global', msg: 'Erreur lors de la suppression du compte.' }]
+    errors.value.push({
+      field: 'global',
+      msg: 'Erreur lors de la suppression du compte. Veuillez réessayer.'
+    });
   }
 }
 
@@ -348,21 +378,26 @@ function getError(field) {
   const error = errors.value.find(error => error.field === field);
   return error ? error.msg : null;
 }
+
+const showStatus = ref(false);
+
+const displayStatus = () => {
+  showStatus.value = true;
+  setTimeout(() => {
+    showStatus.value = false;
+  }, 2500);
+};
+
 </script>
 
 
 <style scoped>
-
-
 .logout-container {
+  margin-top: 1rem;
   display: flex;
   justify-content: flex-end;
 }
 
-.logout {
-  display: flex;
-  justify-content: flex-end;
-}
 
 h2 {
   color: var(--text-color);
@@ -396,10 +431,11 @@ h2 {
   /* Augmente l'espace sous le lien */
   cursor: pointer;
   text-decoration: none;
-  color:var(--error);
+  color: var(--error);
   font-size: 2rem;
-  font-family: var(--sen-bold); /* Utiliser la police de caractères personnalisée */
-    font-weight: var(--bold);
+  font-family: var(--sen-bold);
+  /* Utiliser la police de caractères personnalisée */
+  font-weight: var(--bold);
 
 }
 
@@ -432,7 +468,24 @@ label {
 }
 
 .error-message {
-    color: var(--error);
-    margin-left: 1rem;
+  color: var(--error);
+  margin-left: 1rem;
 }
+
+.button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.status-message {
+  width: 92%;
+  position: fixed;
+  margin-bottom: 1rem;
+  bottom: 4rem; /* Ajustez cette valeur pour qu'elle soit au-dessus de la barre de navigation */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+}
+
+
 </style>

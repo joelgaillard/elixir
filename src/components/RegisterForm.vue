@@ -25,7 +25,9 @@
         </div>
         <div class="register-element buttons">
             <Button text="S'inscrire et se connecter" />
-            <div>Vous avez déjà un compte? <router-link to="/login">Connexion</router-link></div>
+            <div>Vous avez déjà un compte? <router-link :to="{ path: '/login', query: $route.query }">
+                    Connexion
+                </router-link></div>
         </div>
     </form>
 </template>
@@ -34,10 +36,11 @@
 import { ref } from 'vue'
 import TextInput from './TextInput.vue'
 import Button from './Button.vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useFetchApiCrud } from '../composables/useFetchApiCrud'
 import { setDefaultHeaders } from '../composables/useFetchApi'
-import {user, token, isAuthenticated} from '../store/user'
+import { user, token, isAuthenticated } from '../store/user'
+
 
 const username = ref('')
 const email = ref('')
@@ -45,6 +48,7 @@ const password = ref('')
 const confirmPassword = ref('')
 const errors = ref([])
 const router = useRouter()
+const route = useRoute()
 
 const usersApi = useFetchApiCrud('users', import.meta.env.VITE_API_URL)
 
@@ -73,7 +77,6 @@ async function handleRegister() {
         method: 'POST'
     }).catch(e => {
         errors.value = e.data.errors
-        console.error(e.data)
     })
 
     if (response?.token) {
@@ -82,25 +85,20 @@ async function handleRegister() {
         await new Promise(resolve => setTimeout(resolve, 100))
 
         const userData = await usersApi.fetchApi({
-                url: 'users/me',
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${response.token}`
-                }
-            })
+            url: 'users/me',
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${response.token}`
+            }
+        })
 
-            user.value = userData
-            isAuthenticated.value = true
-            token.value = response.token
-
-
-
-
-        console.log('Data:', response)
-        console.log('Token:', response.token)
+        user.value = userData
         isAuthenticated.value = true
-        router.go(-2)
-        
+        token.value = response.token
+        isAuthenticated.value = true
+        const redirectPath = route.query.redirect || '/'
+        router.push(redirectPath)
+
     }
 }
 
@@ -111,8 +109,6 @@ form {
     display: flex;
     flex-direction: column;
     align-items: right;
-    padding-left: 5%;
-    padding-right: 5%;
 }
 
 .register-element {

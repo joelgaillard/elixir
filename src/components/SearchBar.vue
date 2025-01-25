@@ -32,7 +32,6 @@ watch(searchQuery, (newValue) => {
         // Émet les résultats et la requête actuelle
         emit('search-results', { cocktails: response.cocktails, pagination: response.pagination }, newValue)
       } catch (error) {
-        console.error('Erreur lors de la recherche :', error)
       }
     } else {
       emit('reset-search') // Réinitialise la recherche

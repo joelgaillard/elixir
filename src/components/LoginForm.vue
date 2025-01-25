@@ -1,7 +1,7 @@
 <template>
     <form @submit.prevent="handleLogin">
         <div class="login-element title">
-        <h1>Connexion</h1>
+            <h1>Connexion</h1>
         </div>
         <div class="login-element" :class="{ 'has-error': hasError('email') }">
             <label for="email">E-mail</label>
@@ -14,8 +14,9 @@
             <div v-if="getError('password')" class="error-message">{{ getError('password') }}</div>
         </div>
         <div class="login-element buttons">
-            <Button text="Se connecter"/>
-            <div>Vous n’avez pas de compte? <router-link to="/register">S’inscrire</router-link></div>
+            <Button text="Se connecter" />
+            <div>Vous n’avez pas de compte? <router-link
+                    :to="{ path: '/register', query: $route.query }">S’inscrire</router-link></div>
         </div>
     </form>
 </template>
@@ -24,12 +25,13 @@
 import { ref } from 'vue'
 import TextInput from './TextInput.vue'
 import Button from './Button.vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useFetchApiCrud } from '../composables/useFetchApiCrud'
 import { setDefaultHeaders } from '../composables/useFetchApi'
-import {user, token, isAuthenticated} from '../store/user'
+import { user, token, isAuthenticated } from '../store/user'
 
 const router = useRouter()
+const route = useRoute()
 const email = ref('')
 const password = ref('')
 const errors = ref([])
@@ -37,12 +39,12 @@ const authApi = useFetchApiCrud('users/login', import.meta.env.VITE_API_URL)
 
 
 function hasError(field) {
-  return errors.value.some(error => error.field === field)
+    return errors.value.some(error => error.field === field)
 }
 
 function getError(field) {
-  const error = errors.value.find(error => error.field === field)
-  return error ? error.msg : null
+    const error = errors.value.find(error => error.field === field)
+    return error ? error.msg : null
 }
 
 async function handleLogin() {
@@ -59,10 +61,10 @@ async function handleLogin() {
         if (response?.token) {
             // 1. Définir le token dans les headers
             setDefaultHeaders({ Authorization: `Bearer ${response.token}` })
-            
+
             // 2. Attendre que les headers soient mis à jour
             await new Promise(resolve => setTimeout(resolve, 100))
-            
+
             // 3. Récupérer les données utilisateur avec le nouveau token
             const userData = await authApi.fetchApi({
                 url: 'users/me',
@@ -71,21 +73,18 @@ async function handleLogin() {
                     'Authorization': `Bearer ${response.token}`
                 }
             })
-            
+
             // 4. Mettre à jour le store
             user.value = userData
             isAuthenticated.value = true
             token.value = response.token
 
-            console.log(user.value)
-            console.log(token.value)
-            
-            // 5. Rediriger
-            router.back()
+            const redirectPath = route.query.redirect || '/'
+            router.push(redirectPath)
+
         }
     } catch (e) {
         errors.value = e.data?.errors || [{ field: 'email', msg: 'Erreur interne du serveur' }, { field: 'password', msg: 'Erreur interne du serveur' }]
-        console.error('Erreur:', e)
     }
 }
 
@@ -97,8 +96,6 @@ form {
     display: flex;
     flex-direction: column;
     align-items: right;
-    padding-left: 5%;
-    padding-right: 5%;
 }
 
 .login-element {
@@ -122,7 +119,4 @@ label {
     gap: 2rem;
     justify-content: center;
 }
-
-
-
 </style>

@@ -1,37 +1,30 @@
 class ChatService {
   constructor(barId, userid, token, coords) {
     const wsUrl = `wss://elixir-api-st9s.onrender.com?barId=${barId}&userId=${userid}&token=${token}&lat=${coords.latitude}&lng=${coords.longitude}`;
-    console.log('WebSocket URL:', wsUrl); // Log pour vérifier l'URL
     this.ws = new WebSocket(wsUrl);
     this.connected = false;
 
     this.ws.onopen = () => {
       this.connected = true;
-      console.log('Connecté au chat');
     };
 
     this.ws.onmessage = (event) => {
-      console.log('Message reçu:', event.data);
       try {
         const data = JSON.parse(event.data);
     
         if (data.error) {
-          console.error('Erreur serveur:', data.error);
           return;
         }
     
         if (data.data && typeof data.data === 'object') {
-          console.log('Données reçues:', data.data);
           const { userId, content, username, timestamp } = data.data;
     
           if (this.messageCallback) {
             this.messageCallback({ userId, username, content, timestamp });
           }
         } else {
-          console.error('Données mal formatées :', data);
         }
       } catch (error) {
-        console.error('Erreur de parsing:', error);
       }
     };
 

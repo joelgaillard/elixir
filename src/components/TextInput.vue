@@ -9,7 +9,6 @@
   </template>
   
   <script setup>
-  import { defineProps, defineEmits } from 'vue'
   
   // Définition des props avec validation
   const props = defineProps({

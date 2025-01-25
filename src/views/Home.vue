@@ -1,31 +1,47 @@
 <template>
   <div class="container">
+    <div v-if="!isAuthenticated"  class="login-container">
+      <Button class="login-element" text="Se connecter" icon="fa fa-user" @click="goToLogin" />
+      <router-link class="login-element" :to="{ path: '/register', query: $route.query }">S’inscrire</router-link>
+    </div>
+
     <h1>Cocktails</h1>
     <div class="toolbar">
+      <!-- Barre de recherche -->
       <div class="search-bar">
         <SearchBar @search-results="handleSearchResults" @reset-search="resetSearch" />
       </div>
+
+      <!-- Filtres avec indicateur de chargement pour les ingrédients -->
       <div class="dropdown-filter">
         <DropdownFilter :default-text="'Filtrer par ingrédients'" :options="ingredients" @filter-selected="handleFilter"
           @reset-filters="resetFilters" />
       </div>
+
+      <!-- Tri -->
       <div class="dropdown-sort">
-        <DropdownSort 
-        :options="sortOptions" 
-        @sort-selected="handleSort"
-      />
+        <DropdownSort :options="sortOptions" @sort-selected="handleSort" />
       </div>
     </div>
 
-  </div>
-  <div class="cocktail-grid">
-    <div v-for="cocktail in cocktails" :key="cocktail._id" class="cocktail-card">
-      <CocktailCard :id="cocktail._id" :name="cocktail.name" :image="cocktail.image_url" :rank="cocktail.rank" :ratings-count="cocktail.ratingsCount" />
+    <!-- Indicateur de chargement pour la grille -->
+    <Loading v-if="loading" label="Chargement" />
+
+    <!-- Grille des cocktails -->
+    <div v-else>
+      <div class="cocktail-grid">
+        <div v-for="cocktail in cocktails" :key="cocktail._id" class="cocktail-card">
+          <CocktailCard :id="cocktail._id" :name="cocktail.name" :image="cocktail.image_url" :rank="cocktail.rank"
+            :ratings-count="cocktail.ratingsCount" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+      <Pagination :currentPage="currentPage" :totalPages="totalPages" @page-changed="handlePageChange" />
     </div>
   </div>
-  <div class="pagination">
-  <Pagination :currentPage="currentPage" :totalPages="totalPages" @page-changed="handlePageChange" />
-</div>
 </template>
 
 <script setup>
@@ -37,16 +53,21 @@ import SearchBar from '../components/SearchBar.vue'
 import DropdownFilter from '../components/DropdownFilter.vue'
 import DropdownSort from '../components/DropdownSort.vue'
 import Pagination from '../components/Pagination.vue'
+import Loading from '../components/Loading.vue'
+import Button from '../components/Button.vue'
+import { isAuthenticated } from '../store/user'
+
 
 const cocktails = ref([])
 const ingredients = ref([])
+const loading = ref(false)
 const error = ref(false)
 const currentPage = ref(1)
 const totalPages = ref(1)
 const searchQuery = ref(null)
 const selectedIngredients = ref([])
 const selectedSort = ref(null);
-const sortOrder = ref('desc') // Par défaut, ordre descendant
+const sortOrder = ref('desc')
 
 const sortOptions = ref([
   { value: 'name', label: 'Nom' },
@@ -59,17 +80,18 @@ const cocktailCrud = useFetchApiCrud('cocktails', import.meta.env.VITE_API_URL)
 const ingredientsCrud = useFetchApiCrud('ingredients', import.meta.env.VITE_API_URL)
 
 async function fetchCocktails() {
+  loading.value = true // Début du chargement
   try {
     let url = `cocktails?page=${currentPage.value}`
-    
+
     if (selectedSort.value) {
       url += `&sort=${selectedSort.value}&order=${sortOrder.value}`
     }
-    
+
     if (selectedIngredients.value.length > 0) {
       url += `&ingredients=${selectedIngredients.value.join(',')}`
     }
-    
+
     if (searchQuery.value) {
       url += `&name=${searchQuery.value}`
     }
@@ -83,6 +105,8 @@ async function fetchCocktails() {
     totalPages.value = data.pagination.totalPages
   } catch (e) {
     error.value = true
+  } finally {
+    loading.value = false // Fin du chargement
   }
 }
 
@@ -90,12 +114,14 @@ async function fetchIngredients() {
   try {
     const data = await ingredientsCrud.fetchApi({
       url: 'ingredients',
-      method: 'GET'
+      method: 'GET',
     })
-    ingredients.value = data;
+    ingredients.value = data
   } catch (e) {
+    error.value = true
   }
 }
+
 
 const handleFilter = (ingredients) => {
   selectedIngredients.value = ingredients
@@ -119,20 +145,6 @@ const handleSort = (sortOption) => {
 const handlePageChange = (page) => {
   currentPage.value = page
   fetchCocktails()
-}
-
-function nextPage() {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++
-    fetchCocktails()
-  }
-}
-
-function prevPage() {
-  if (currentPage.value > 1) {
-    currentPage.value--
-    fetchCocktails()
-  }
 }
 
 function goToLogin() {
@@ -159,13 +171,37 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.login-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+  gap: 1rem;
+  font-weight: bold;
+  font-size: 1rem;
+  align-items: center;
+}
+
+
+.login-element {
+  font-family: var(--sen-bold);
+
+}
+
+
 .cocktail-grid {
   display: grid;
   grid-template-columns: repeat(1, 1fr);
   gap: 1rem;
 }
 
+@media screen and (max-width: 767px) {
+  .login-container {
+    justify-content: space-between;
+    flex-direction: row-reverse;
+  }
 
+  
+}
 
 /* Mobile grand/Tablette portrait (400px - 767px) : 2 colonnes */
 @media (min-width: 400px) and (max-width: 767px) {

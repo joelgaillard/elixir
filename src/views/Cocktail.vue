@@ -1,136 +1,229 @@
 <template>
-  <div class="cocktail-page">
-    <!-- Image Principale -->
+  <div class="cocktail-page" v-if="!isLoading">
+    <!-- Image principale -->
     <div class="cocktail-image">
-      <img :src="cocktail.image_url" alt="Cocktail Image" />
+      <img :src="cocktail.value.image_url" alt="Cocktail Image" />
     </div>
 
-    <!-- Nom et Description -->
+    <!-- Nom et description -->
     <div class="header-element cocktail-header">
       <h1 class="header-title">
-        {{ cocktail.name }}
-        <span class="favorite" @click="toggleFavorite">
-          <i :class="favoriteIcon"></i>
-        </span>
+        {{ cocktail.value.name }}
+        <div class="favorite">
+          <i :class="favoriteIcon" @click.stop="toggleFavorite" @mouseover="handleMouseOver" @mouseleave="handleMouseLeave"></i>
+        </div>
       </h1>
       <div class="header-element cocktail-rating">
         <i class="fa-solid fa-star star"></i>
-        <span>{{ roundRank(cocktail.rank) }}/5 ({{cocktail.ratingsCount}})</span>
+        <span>{{ roundRank(cocktail.value.rank) }}/5 ({{ cocktail.value.ratingsCount }})</span>
+        <div>
+          <button class="rating-button" @click="displayRatingPopUp">Noter le cocktail</button>
+
+          <!-- Pop-up de notation -->
+          <div v-if="showRatingPopup" class="rating-popup">
+            <div class="popup-overlay" @click="closeRatingPopup"></div>
+            <div class="popup-content">
+              <Rating @close="closeRatingPopup" @submit-rating="handleSubmitRating" />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
     <div class="cocktail-description">
-      <p>{{ cocktail.description }}</p>
+      <p>{{ cocktail.value.description }}</p>
     </div>
 
-    <!-- Boutons Instructions et Ingrédients -->
+    <!-- Onglets Instructions et Ingrédients -->
     <div class="cocktail-tabs">
-      <button class="tab" :class="{ active: activeTab === 'instructions' }"
-        @click="activeTab = 'instructions'">Instructions</button>
-      <button class="tab" :class="{ active: activeTab === 'ingredients' }"
-        @click="activeTab = 'ingredients'">Ingrédients</button>
+      <button class="tab" :class="{ active: activeTab === 'instructions' }" @click="setActiveTab('instructions')">
+        Instructions
+      </button>
+      <button class="tab" :class="{ active: activeTab === 'ingredients' }" @click="setActiveTab('ingredients')">
+        Ingrédients
+      </button>
     </div>
 
     <!-- Contenu dynamique -->
     <div v-if="activeTab === 'instructions'" class="cocktail-instructions">
       <ol>
-        <li v-for="(instruction, index) in cocktail.instructions" :key="index">
-          {{ instruction }}.
+        <li v-for="(instruction, index) in cocktail.value.instructions" :key="index">
+          {{ index + 1 }}. {{ instruction }}
         </li>
       </ol>
     </div>
-
     <div v-if="activeTab === 'ingredients'" class="cocktail-ingredients">
       <ul>
-        <li v-for="(ingredient, index) in cocktail.ingredients" :key="index">
-          {{ ingredient.quantity ? `${ingredient.quantity} ` : '' }} {{ ingredient.unit ? `${ingredient.unit} de` : ''
-          }} {{ ingredient.name }}
+        <li v-for="(ingredient, index) in cocktail.value.ingredients" :key="index">
+          {{ ingredient.quantity ? `${ingredient.quantity} ` : '' }}{{ ingredient.unit ? `${ingredient.unit} de` : '' }}
+          {{ ingredient.name }}
         </li>
       </ul>
     </div>
 
-    <!-- Appel à Action -->
+    <!-- Carte et appel à l'action -->
     <div class="cta">
       <h2>Venez le tester !</h2>
       <div class="map-placeholder">
-        <!-- Carte -->
         <img src="https://via.placeholder.com/400x300?text=Map" alt="Carte pour trouver un bar" />
         <button class="btn-find-bar">Trouver un bar</button>
       </div>
     </div>
 
+    <Status v-if="showStatus" message="Votre avis a été ajouté" type="success" class="status-message" />
   </div>
+
+    <Loading v-else />
+
 </template>
+
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { useFetchApiCrud } from "../composables/useFetchApiCrud";
+import Rating from "../components/Rating.vue";
+import Status from "../components/Status.vue";
 import { isAuthenticated } from "../store/user";
+import Loading from "../components/Loading.vue";
 
 const props = defineProps({
   id: {
     type: String,
-    required: true
-  }
-})
-
-const cocktailCrud = useFetchApiCrud('cocktails', import.meta.env.VITE_API_URL)
-const { data: cocktail } = cocktailCrud.read(props.id)
-
-
-// Gestion des onglets actifs
-const activeTab = ref("instructions");
-
-// Gestion des favoris
-const isHovered = ref(false);
-const isFavorite = ref(false);
-
-const favoriteIcon = computed(() => {
-  return isFavorite.value ? "fa-solid fa-heart" : "fa-regular fa-heart";
+    required: true,
+  },
 });
 
+// Initialisation des données
+const cocktailCrud = useFetchApiCrud("cocktails", import.meta.env.VITE_API_URL);
 const favoritesApi = useFetchApiCrud("users/me/favorites", import.meta.env.VITE_API_URL);
+const cocktail = ref({});
+const isLoading = ref(true); // État de chargement
+
+const isFavorite = ref(false);
+const isHovered = ref(false);
+const isMobile = ref(false);
+
+onMounted(async () => {
+  isMobile.value = /Mobi|Android/i.test(navigator.userAgent);
+  await loadCocktailData();
+  await checkFavorite();
+});
+
+const loadCocktailData = async () => {
+  try {
+    const response = await cocktailCrud.read(props.id);
+    cocktail.value = response.data;
+  } catch (error) {
+  } finally {
+    isLoading.value = false;
+  }
+};
 
 const checkFavorite = async () => {
   if (isAuthenticated.value) {
-    // Vérifiez si le cocktail est déjà dans les favoris
-    const response = await favoritesApi.read(cocktail._id);
-    isFavorite.value = response.data.includes(cocktail._id);
+    try {
+      const response = await favoritesApi.fetchApi({
+        url: `users/me/favorites/${props.id}`,
+        method: "GET",
+      });
+      isFavorite.value = !!response._id;
+    } catch (error) {
+    }
   }
 };
-
-const emit = defineEmits(["remove-favorite"]);
 
 const toggleFavorite = async () => {
   if (!isAuthenticated.value) {
-    // Redirigez vers la page de connexion ou affichez un message
+    alert("Vous devez être connecté pour gérer les favoris.");
     return;
   }
-
-  if (isFavorite.value) {
-    // Supprimez des favoris
-    await favoritesApi.delete(cocktail._id);
-    isFavorite.value = false;
-    emit("remove-favorite", cocktail._id);
-  } else {
-    // Ajoutez aux favoris
-    await favoritesApi.create(cocktail._id);
-    isFavorite.value = true;
+  try {
+    if (isFavorite.value) {
+      await favoritesApi.fetchApi({
+        url: `users/me/favorites/${props.id}`,
+        method: "DELETE",
+      });
+      isFavorite.value = false;
+    } else {
+      await favoritesApi.fetchApi({
+        url: "users/me/favorites",
+        method: "POST",
+        data: { cocktail_id: props.id },
+      });
+      isFavorite.value = true;
+    }
+  } catch (error) {
   }
 };
 
-const formattedInstructions = computed(() => {
-  if (!cocktail.value?.instructions) return [];
-  return cocktail.value.instructions.split('. ').filter(Boolean);
+const favoriteIcon = computed(() => {
+  if (isHovered.value) {
+    return isFavorite.value ? "fa-regular fa-heart" : "fa-solid fa-heart";
+  }
+  return isFavorite.value ? "fa-solid fa-heart" : "fa-regular fa-heart";
 });
 
-function roundRank(rank) {
-  return Math.round(rank * 10) / 10;
-}
+const handleMouseOver = () => {
+  if (!isMobile.value) {
+    isHovered.value = true;
+  }
+};
 
+const handleMouseLeave = () => {
+  if (!isMobile.value) {
+    isHovered.value = false;
+  }
+};
 
-onMounted(checkFavorite);
+const activeTab = ref("instructions");
+const setActiveTab = (tab) => {
+  activeTab.value = tab;
+};
+
+const showRatingPopup = ref(false);
+
+const displayRatingPopUp = () => {
+  if (!isAuthenticated.value) {
+    alert("Vous devez être connecté pour noter un cocktail.");
+    return;
+  }
+  showRatingPopup.value = true;
+};
+
+const closeRatingPopup = () => {
+  showRatingPopup.value = false;
+};
+
+const handleSubmitRating = async (rating) => {
+  try {
+    await cocktailCrud.fetchApi({
+      url: `/cocktails/${props.id}/ratings`,
+      data: { rating },
+      method: "PUT",
+    });
+
+    const updatedCocktail = await cocktailCrud.read(props.id);
+    cocktail.value = updatedCocktail.data;
+
+    closeRatingPopup();
+    displayStatus();
+  } catch (error) {
+  }
+};
+
+const showStatus = ref(false);
+
+const displayStatus = () => {
+  showStatus.value = true;
+  setTimeout(() => {
+    showStatus.value = false;
+  }, 2500);
+};
+
+const roundRank = (rank) => Math.round(rank * 10) / 10 || 0;
 </script>
+
+
 
 <style scoped>
 /* Global */
@@ -139,6 +232,17 @@ onMounted(checkFavorite);
   color: var(--text-color);
   background-color: #fff;
 }
+
+.status-message {
+  width: 92%;
+  position: fixed;
+  margin-bottom: 1rem;
+  bottom: 4rem; /* Ajustez cette valeur pour qu'elle soit au-dessus de la barre de navigation */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+}
+
 
 /* Image Principale réduite à un tiers */
 .cocktail-image img {
@@ -236,7 +340,8 @@ onMounted(checkFavorite);
   /* 10px en rem */
 }
 
-.tab {
+.tab,
+.rating-button {
   background-color: var(--background-color);
   /* Couleur par défaut pour les non-actifs */
   color: var(--text-color);
@@ -252,6 +357,11 @@ onMounted(checkFavorite);
   cursor: pointer;
   font-size: 1rem;
   /* 1em reste inchangé */
+}
+
+.rating-button {
+  background-color: gold;
+  color: var(--text-color);
 }
 
 .tab.active {
@@ -359,5 +469,32 @@ onMounted(checkFavorite);
 
 .bottom-nav button:focus {
   color: var(--primary-color);
+}
+
+.rating-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.popup-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.popup-content {
+  position: relative;
+}
+
+button {
+  cursor: pointer;
 }
 </style>
