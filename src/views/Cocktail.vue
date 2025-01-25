@@ -72,8 +72,9 @@
 
     <Status v-if="showStatus" message="Votre avis a été ajouté" type="success" class="status-message" />
   </div>
-
-    <Loading v-else />
+<div v-else >
+    <Loading />
+  </div>
 
 </template>
 
