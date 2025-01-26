@@ -136,6 +136,7 @@ const deletePasswords = ref({
 })
 
 const authApi = useFetchApiCrud('users/login', import.meta.env.VITE_API_URL)
+const usersApi = useFetchApiCrud('users', import.meta.env.VITE_API_URL)
 const errors = ref([])
 
 const showPasswordChange = ref(false)
@@ -218,7 +219,6 @@ async function verifyPassword(password, field) {
 
 async function handleSave() {
 
-
   if (passwords.value.newPassword && !passwords.value.currentPassword) {
     errors.value = [{
       field: 'currentPassword',
@@ -257,48 +257,32 @@ async function handleSave() {
     return
   }
 
-
   const updates = {}
   if (userInfo.value.username !== originalUserInfo.value.username) updates.username = userInfo.value.username
   if (userInfo.value.email !== originalUserInfo.value.email) updates.email = userInfo.value.email
   if (passwords.value.newPassword) updates.password = passwords.value.newPassword
 
   try {
-    const response = await fetch('/api/users/me', {
+    const response = await usersApi.fetchApi({
+      url: 'users/me',
+      data: updates,
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token.value}`,
-      },
-      body: JSON.stringify(updates),
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
+    if (response.user.username) user.value.username = response.user.username;
+    if (response.user.email) user.value.email = response.user.email;
 
-      if (errorData.errors) {
-        errors.value = errorData.errors.map(err => ({
-          field: err.field,
-          msg: err.msg,
-        }));
-      } else {
-        errors.value = [{ field: 'global', msg: 'Une erreur est survenue.' }];
-      }
-      return;
-    }
-
-    const data = await response.json();
-
-    if (data.user.username) user.value.username = data.user.username;
-    if (data.user.email) user.value.email = data.user.email;
-
-    if (data.user.username) userInfo.value.username = data.user.username;
-    if (data.user.email) userInfo.value.email = data.user.email;
+    if (response.user.username) userInfo.value.username = response.user.username;
+    if (response.user.email) userInfo.value.email = response.user.email;
 
     displayStatus();
     resetState();
-  } catch (error) {
-    errors.value = [{ field: 'global', msg: 'Erreur lors de la mise à jour des informations utilisateur.' }];
+
+  } catch (e) {
+    errors.value = e.data.errors.map(err => ({
+      field: err.field,
+      msg: err.msg,
+    }));
   }
 }
 

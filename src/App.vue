@@ -3,7 +3,7 @@
 
     <div v-if="isLoading || isError" class="loading-container">
       <Loading label="Connexion au serveur…" />
-      <p v-if="isError" class="error-message">Impossible de se connecter au serveur. Veuillez réessayer plus tard.</p>
+      <p v-if="isError" class="error-server">Impossible de se connecter au serveur. Veuillez réessayer plus tard.</p>
     </div>
 
     <div v-else>
@@ -90,7 +90,7 @@ onUnmounted(() => {
   font-size: 1.2rem;
 }
 
-.error-message {
+.error-server {
   color: var(--error);
   margin-top: 1rem;
   font-size: 1rem;
