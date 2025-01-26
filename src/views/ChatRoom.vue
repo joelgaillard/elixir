@@ -21,6 +21,7 @@
         <i class="fa-solid fa-paper-plane"></i>
       </button>
     </div>
+    <Status v-if="error" message="Vous devez être à moins de 100m d'un salon de discussion pour pouvoir vous y connecter" type="error" class="status-message" />
   </div>
   <ConnectionLanding v-else activeIcon="fa-solid fa-comments" />
 </template>
@@ -34,6 +35,7 @@ import ChatService from '../services/WebSocketService';
 import useLocationStore from '../store/locationStore';
 import { useFetchApiCrud } from '../composables/useFetchApiCrud';
 import BackButton from '../components/BackButton.vue';
+import Status from '../components/Status.vue';
 
 defineProps({
   id: {
@@ -51,6 +53,7 @@ const barCrud = useFetchApiCrud('bars', import.meta.env.VITE_API_URL);
 const { coords, locationReady } = useLocationStore();
 let wsService = null;
 const bar = ref(null);
+const error = ref(false);
 
 const fetchBarInfo = async () => {
   try {
@@ -72,6 +75,7 @@ const fetchMessages = async () => {
     messages.value = response;
     scrollToBottom();
   } catch (error) {
+    error.value = true;
   }
 };
 
@@ -107,12 +111,10 @@ const sendMessage = () => {
 };
 
 const initializeWebSocket = () => {
-  console.log('Initialisation WebSocket avec coords:', coords.value);
 
   wsService = new ChatService(route.params.id, user.value?._id, token.value, coords.value);
 
   wsService.onMessage((data) => {
-    console.log('Message reçu :', data);
 
     const { userId, content, username, timestamp } = data;
 
@@ -124,17 +126,16 @@ const initializeWebSocket = () => {
         timestamp: timestamp || Date.now(),
       });
       scrollToBottom();
-    } else {
-      console.error('Données du message manquantes :', data);
     }
   });
 
-  wsService.onError((error) => {
-    console.error('Erreur WebSocket :', error);
+  wsService.onError((e) => {
+    console.error('Erreur WebSocket :', e);
+    error.value = true;
   });
 
   wsService.onClose(() => {
-    console.warn('Connexion WebSocket fermée.');
+    error.value = true;
   });
 };
 

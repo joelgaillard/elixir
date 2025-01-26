@@ -231,7 +231,6 @@ async function fetchBars() {
       method: 'GET',
     })
 
-    console.log(data)
 
     bars.value = data
   } catch (e) {

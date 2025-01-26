@@ -1,7 +1,7 @@
 <template>
   <div id="app">
 
-    <div v-if="isLoading || isError" class="loading-container">
+    <div v-if="isLoading || isError" class="app-loading-container">
       <Loading label="Connexion au serveur…" />
       <p v-if="isError" class="error-server">Impossible de se connecter au serveur. Veuillez réessayer plus tard.</p>
     </div>
@@ -75,17 +75,17 @@ onUnmounted(() => {
   flex-direction: column;
 }
 
-.loading-container {
+.app-loading-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background-color: #f8f8f8;
+  background-color: var(--background-color);
   font-family: Arial, sans-serif;
 }
 
-.loading-container p {
+.app-loading-container p {
   margin-top: 1rem;
   font-size: 1.2rem;
 }

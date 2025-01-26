@@ -27,8 +27,6 @@ const barIcon = L.icon({
 
 onMounted(() => {
 
-    console.log(props.bars);
-
     map = L.map('mapContainer').setView([46.78151750065407, 6.6473526004547905], 13);
 
     L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {

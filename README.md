@@ -1,58 +1,58 @@
-# Elixir
+# Elixir - Cocktails
 
-Elixir est une application de gestion de recettes de cocktails développée avec Vue 3 et Vite. Ce template fournit une configuration de base pour commencer rapidement.
+## Présentation du Projet
 
-## Recommended IDE Setup
+Pour une présentation détaillée du projet, y compris ses fonctionnalités et son contexte, consultez le fichier dédié :
+👉 [Présentation du Projet](./PRESENTATION.md)
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (et désactiver Vetur).
 
-## Customize configuration
+## Installation du projet en local
+Pour exécuter ce projet localement, assurez-vous que votre environnement de développement inclue les éléments suivants :
+- Node.js (v23 ou supérieur)
+- npm
 
-Voir [Vite Configuration Reference](https://vite.dev/config/).
+### Étape 1: Clonage du dépôt
+Clonez ce dépôt sur votre machine locale en utilisant :
 
-## Project Setup
-
-```sh
-npm install
+```bash
+git clone https://github.com/joelgaillard/elixir.git
+cd elixir
 ```
 
-### Compile and Hot-Reload for Development
+### Étape 2: Configuration de l'environnement
+Dupliquez le fichier `.env.example` pour créer un fichier `.env` que vous devrez configurer selon votre environnement de développement.
 
-```sh
+```bash
+cp .env.example .env
+```
+
+### Étape 3: Configuration initiale
+Rendez le script de configuration exécutable et exécutez-le.
+
+```bash
+chmod +x setup.sh
+./setup.sh
+```
+
+### Étape 4: Lancement du serveur de développement
+Démarrer le serveur de développement: 
+
+```bash
 npm run dev
 ```
 
-### Compile and Minify for Production
+### (Optionnel) - Utiliser l'API en local
 
-```sh
-npm run build
-```
+Si vous souhaitez exécuter l'API en local, suivez ces étapes :
 
-## Description du Projet
+1. **Cloner le dépôt de l'API**  
+   Récupérez le projet `elixir-api` depuis son dépôt GitHub :  
+   [https://github.com/joelgaillard/elixir-api.git](https://github.com/joelgaillard/elixir-api.git)
 
-Elixir est conçu pour aider les développeurs à démarrer rapidement avec Vue 3 en utilisant Vite comme outil de construction. Il inclut une configuration de base qui peut être personnalisée selon les besoins du projet.
+2. **Suivre les instructions d'installation**  
+   Consultez le fichier **README** du dépôt pour effectuer correctement l'installation et la configuration de l'API.
 
-## Fonctionnalités
+3. **Configurer le proxy dans votre projet Vue.js**  
+   Modifiez le fichier **vite.config.js** pour ajuster la configuration du proxy afin qu'il pointe vers l'URL locale de votre API. Cela garantit que les requêtes API seront redirigées correctement.
 
-- Configuration de base pour Vue 3
-- Support pour le rechargement à chaud en développement
-- Optimisation pour la production avec minification
-
-## Structure du Projet
-
-- `src/` : Contient les fichiers sources de l'application Vue.
-- `public/` : Contient les fichiers statiques qui seront copiés dans le répertoire de sortie lors de la construction.
-- `vite.config.js` : Fichier de configuration pour Vite.
-
-## Fonctionnalités de l'Application
-
-Elixir est une application de gestion de recettes de cocktails. Elle permet aux utilisateurs de :
-
-- Parcourir une liste de recettes de cocktails.
-- Rechercher des cocktails par nom ou ingrédient.
-- Voir les détails d'une recette de cocktail, y compris les ingrédients et les instructions.
-- Ajouter des recettes de cocktails à leurs favoris.
-- Participer à des salons de discussion à proximité.
-- Gérer leur compte utilisateur.
-
-# elixir
+Ainsi, votre application Vue.js pourra interagir avec l'API exécutée localement.

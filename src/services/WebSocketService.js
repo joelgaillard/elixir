@@ -28,14 +28,12 @@ class ChatService {
     };
 
     this.ws.onerror = (error) => {
-      console.error("Erreur WebSocket:", error);
       if (this.errorCallback) {
         this.errorCallback(error);
       }
     };
 
     this.ws.onclose = () => {
-      console.log("Connexion WebSocket fermée");
       if (this.closeCallback) {
         this.closeCallback();
       }
@@ -50,8 +48,6 @@ class ChatService {
           content: messageData.content,
         })
       );
-    } else {
-      console.error("WebSocket non connecté");
     }
   }
 
