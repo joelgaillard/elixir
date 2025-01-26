@@ -1,6 +1,6 @@
 # Elixir - Cocktails
 
-## Présentation du Projet
+## Présentation du projet
 
 Pour une présentation détaillée du projet, y compris ses fonctionnalités et son contexte, consultez le fichier dédié :
 👉 [Présentation du Projet](./PRESENTATION.md)
