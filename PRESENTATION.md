@@ -1,15 +1,15 @@
 # Elixir, frontend - Gestion de cocktails et bars
 
-## Description Générale
+## Description générale
 Cette application est une Progressive Web App (PWA) permettant aux utilisateurs d’explorer une base de cocktails, de découvrir des bars à proximité et d’interagir via des salons de discussion en temps réel. Elle propose des fonctionnalités adaptées aux **utilisateurs non connectés**, **connectés**, ainsi qu’aux **managers** et **administrateurs**.  
 Actuellement, ce projet **frontend** se concentre uniquement sur les fonctionnalités destinées aux **utilisateurs**. Les fonctionnalités liées aux **managers** et **administrateurs** sont implémentées dans le **backend** mais non disponibles dans l’interface utilisateur.
 
 ---
 
-## Catégories d’Utilisateurs
+## Catégories d’utilisateurs
 
 ### **1. Utilisateurs**
-- **Non Connectés** : Accès limité à la navigation et à la recherche.
+- **Non connectés** : Accès limité à la navigation et à la recherche.
 - **Connectés** : Accès complet, incluant la gestion des favoris, l’évaluation des cocktails et l’interaction via des salons de discussion.
 
 ### **2. Managers** *(Non implémenté dans le frontend)*  
@@ -23,9 +23,9 @@ Actuellement, ce projet **frontend** se concentre uniquement sur les fonctionnal
 
 ---
 
-## Routes et Fonctionnalités
+## Routes et fonctionnalités
 
-### 1. Utilisateurs Non Connectés
+### 1. Utilisateurs non connectés
 
 #### **`/` ou `/cocktails`**
 - Permet de consulter une liste de cocktails avec les informations suivantes :
@@ -69,7 +69,7 @@ Actuellement, ce projet **frontend** se concentre uniquement sur les fonctionnal
 
 ---
 
-### 2. Utilisateurs Connectés  
+### 2. Utilisateurs connectés  
 *(Inclut toutes les fonctionnalités des utilisateurs non connectés, avec des options supplémentaires)*
 
 #### **`/` ou `/cocktails`**
@@ -107,23 +107,23 @@ Actuellement, ce projet **frontend** se concentre uniquement sur les fonctionnal
 ---
 
 ### 3. Managers *(Backend uniquement, non implémenté dans le frontend)*  
-- **Gestion des Bars** : Création et mise à jour des informations sur les bars.
-- **Gestion des Cocktails** : Ajout de nouveaux cocktails à la base de données et association de cocktails spécifiques aux bars.
-- **Gestion des Salons** : Création et gestion des salons de discussion des bars.
+- **Gestion des bars** : Création et mise à jour des informations sur les bars.
+- **Gestion des cocktails** : Ajout de nouveaux cocktails à la base de données et association de cocktails spécifiques aux bars.
+- **Gestion des salons** : Création et gestion des salons de discussion des bars.
 
 ---
 
 ### 4. Administrateurs *(Backend uniquement, non implémenté dans le frontend)*  
-- **Gestion des Managers** :
+- **Gestion des managers** :
   - Création et modification des comptes managers.
   - Suppression des comptes managers.
 
 ---
 
 ## Technologies Utilisées
-- **Framework Frontend** : Développement réalisé avec **Vue.js** pour une interface dynamique et réactive.
-- **Cartes et Géolocalisation** : Intégration de **Leaflet** pour afficher les bars à proximité.
-- **Communication en Temps Réel** : Utilisation de **WebSocket** pour les salons de discussion.
+- **Framework frontend** : Développement réalisé avec **Vue.js** pour une interface dynamique et réactive.
+- **Cartes et géolocalisation** : Intégration de **Leaflet** pour afficher les bars à proximité.
+- **Communication en temps Réel** : Utilisation de **WebSocket** pour les salons de discussion.
 - **Progressive Web App (PWA)** : Optimisation pour une utilisation fluide sur mobile et desktop.
 
 ---
