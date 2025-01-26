@@ -5,15 +5,9 @@
       <span class="icon"><i class="fa-solid fa-arrow-down-short-wide"></i></span>
     </button>
     <ul v-if="showDropdown" class="dropdown-menu">
-      <li 
-        v-for="option in options" 
-        :key="option.value" 
-        @click="selectSort(option)"
+      <li v-for="option in options" :key="option.value" @click="selectSort(option)"
         :class="{ 'selected': selectedSort === option.value }">
-        <input 
-          type="radio" 
-          :checked="selectedSort === option.value"
-        >
+        <input type="radio" :checked="selectedSort === option.value">
         {{ option.label }}
       </li>
     </ul>
@@ -36,11 +30,11 @@ const props = defineProps({
 
 const emit = defineEmits(['sort-selected']);
 
-const selectedSort = ref(null); // Initialisé à null pour qu'aucun tri ne soit appliqué par défaut
+const selectedSort = ref(null);
 const showDropdown = ref(false);
 
 const displayText = computed(() => {
-  if (!selectedSort.value) return props.defaultText; // Affiche "Trier par" tant qu'aucune option n'est sélectionnée
+  if (!selectedSort.value) return props.defaultText;
   const selectedOption = props.options.find(option => option.value === selectedSort.value);
   return selectedOption ? selectedOption.label : props.defaultText;
 });
@@ -50,9 +44,9 @@ function toggleDropdown() {
 }
 
 function selectSort(option) {
-  selectedSort.value = option.value; // Met uniquement la valeur sélectionnée
+  selectedSort.value = option.value;
   showDropdown.value = false;
-  emit('sort-selected', selectedSort.value); // Émet uniquement la valeur
+  emit('sort-selected', selectedSort.value);
 }
 </script>
 
@@ -64,10 +58,10 @@ function selectSort(option) {
 <style scoped>
 .dropdown-sort {
   position: relative;
-  width: auto; /* S'adapte au contenu ou à son parent */
-  max-width: 100%; /* Évite de dépasser la largeur parent */
-  flex: 1 1 auto; /* Pour une intégration fluide dans un layout flexbox */
-  box-sizing: border-box; /* Inclure les marges et bordures */
+  width: auto;
+  max-width: 100%;
+  flex: 1 1 auto;
+  box-sizing: border-box;
 }
 
 .dropdown-button {
@@ -98,7 +92,7 @@ function selectSort(option) {
   list-style: none;
   max-height: 15rem;
   overflow-y: auto;
-  z-index: 1000; /* Pour éviter les conflits d'affichage */
+  z-index: 1000;
 }
 
 .dropdown-button:hover,
@@ -127,5 +121,4 @@ function selectSort(option) {
 .icon {
   margin-left: 0.5rem;
 }
-
 </style>

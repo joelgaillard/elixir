@@ -1,31 +1,26 @@
 <template>
-    <div v-if="isAuthenticated">
-      <div v-if="locationReady">
-        <h1>Salons de discussions à proximité</h1>
-        <Loading v-if="isLoading" />
+  <div v-if="isAuthenticated">
+    <div v-if="locationReady">
+      <h1>Salons de discussions à proximité</h1>
+      <Loading v-if="isLoading" />
 
-
-        <!-- Liste des bars -->
-        <div v-if="bars.length > 0" class="bar-list">
-          <div v-for="bar in bars" :key="bar._id" class="bar">
-            <Bar :id="bar._id" :name="bar.name" :image="bar.image_url" />
-          </div>
-        </div>
-
-        <!-- Aucun bar trouvé -->
-        <div class="no-bar" v-else-if="!isLoading || fetchError">
-          <i class="fa-solid fa-location-dot fa-10x"></i>
-          <h2>Aucun salon de discussion trouvé à proximité, réessayez à un autre endroit.</h2>
-          <Button text="Retour à la page d'accueil" icon="fa-solid fa-martini-glass-citrus" @click="navigateTo('/')" />
+      <div v-if="bars.length > 0" class="bar-list">
+        <div v-for="bar in bars" :key="bar._id" class="bar">
+          <Bar :id="bar._id" :name="bar.name" :image="bar.image_url" />
         </div>
       </div>
 
-      <!-- Activer la localisation -->
-      <EnableLocation v-else activeIcon="fa-solid fa-location-arrow" />
+      <div class="no-bar" v-else-if="!isLoading || fetchError">
+        <i class="fa-solid fa-location-dot fa-10x"></i>
+        <h2>Aucun salon de discussion trouvé à proximité, réessayez à un autre endroit.</h2>
+        <Button text="Retour à la page d'accueil" icon="fa-solid fa-martini-glass-citrus" @click="navigateTo('/')" />
+      </div>
     </div>
 
-    <!-- Non connecté -->
-    <ConnectionLanding activeIcon="fa-solid fa-comments" v-else />
+    <EnableLocation v-else activeIcon="fa-solid fa-location-arrow" />
+  </div>
+
+  <ConnectionLanding activeIcon="fa-solid fa-comments" v-else />
 </template>
 
 <script setup>
@@ -42,18 +37,16 @@ import { useRouter } from 'vue-router';
 
 const { coords, locationError, locationReady } = useLocationStore();
 
-// Initialisation
 const router = useRouter();
 const barCrud = useFetchApiCrud('bars', import.meta.env.VITE_API_URL);
 const isLoading = ref(true);
 const bars = ref([]);
 const fetchError = ref(false);
-const lastCoords = ref({ latitude: null, longitude: null }); // Dernières coordonnées utilisées
+const lastCoords = ref({ latitude: null, longitude: null });
 
-// Fonction pour calculer la distance entre deux points géographiques
 function calculateDistance(lat1, lon1, lat2, lon2) {
   const toRad = (value) => (value * Math.PI) / 180;
-  const R = 6371e3; // Rayon de la Terre en mètres
+  const R = 6371e3;
   const φ1 = toRad(lat1);
   const φ2 = toRad(lat2);
   const Δφ = toRad(lat2 - lat1);
@@ -64,10 +57,9 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-  return R * c; // Distance en mètres
+  return R * c;
 }
 
-// Fonction de récupération des bars
 const fetchBars = async () => {
   try {
     const { latitude, longitude } = coords.value;
@@ -89,13 +81,11 @@ const fetchBars = async () => {
   }
 };
 
-// Observer les changements de coordonnées
 watch(
   () => coords.value,
   async (newCoords) => {
     const { latitude, longitude } = newCoords;
 
-    // Vérifie si la distance dépasse 50 mètres avant de recharger
     if (
       isAuthenticated.value &&
       latitude !== null &&
@@ -108,7 +98,7 @@ watch(
           longitude
         ) > 50)
     ) {
-      lastCoords.value = { latitude, longitude }; // Met à jour les dernières coordonnées
+      lastCoords.value = { latitude, longitude };
       isLoading.value = true;
       await fetchBars();
     }
@@ -123,7 +113,7 @@ function navigateTo(route) {
 
 
 <style scoped>
-.no-bar{
+.no-bar {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -142,8 +132,7 @@ function navigateTo(route) {
 
 }
 
-h2{
+h2 {
   color: var(--text-color);
 }
-
 </style>

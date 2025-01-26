@@ -1,16 +1,16 @@
 <template>
   <div class="cocktail-page" v-if="!isLoading">
-    <!-- Image principale -->
+
     <div class="cocktail-image">
       <img :src="cocktail.value.image_url" alt="Cocktail Image" />
     </div>
 
-    <!-- Nom et description -->
     <div class="header-element cocktail-header">
       <h1 class="header-title">
         {{ cocktail.value.name }}
         <div class="favorite">
-          <i :class="favoriteIcon" @click.stop="toggleFavorite" @mouseover="handleMouseOver" @mouseleave="handleMouseLeave"></i>
+          <i :class="favoriteIcon" @click.stop="toggleFavorite" @mouseover="handleMouseOver"
+            @mouseleave="handleMouseLeave"></i>
         </div>
       </h1>
       <div class="header-element cocktail-rating">
@@ -19,7 +19,6 @@
         <div>
           <button class="rating-button" @click="displayRatingPopUp">Noter le cocktail</button>
 
-          <!-- Pop-up de notation -->
           <div v-if="showRatingPopup" class="rating-popup">
             <div class="popup-overlay" @click="closeRatingPopup"></div>
             <div class="popup-content">
@@ -34,7 +33,6 @@
       <p>{{ cocktail.value.description }}</p>
     </div>
 
-    <!-- Onglets Instructions et Ingrédients -->
     <div class="cocktail-tabs">
       <button class="tab" :class="{ active: activeTab === 'instructions' }" @click="setActiveTab('instructions')">
         Instructions
@@ -44,13 +42,12 @@
       </button>
     </div>
 
-    <!-- Contenu dynamique -->
     <div v-if="activeTab === 'instructions'" class="cocktail-instructions">
-      <ol>
+      <ul>
         <li v-for="(instruction, index) in cocktail.value.instructions" :key="index">
           {{ index + 1 }}. {{ instruction }}
         </li>
-      </ol>
+      </ul>
     </div>
     <div v-if="activeTab === 'ingredients'" class="cocktail-ingredients">
       <ul>
@@ -61,18 +58,17 @@
       </ul>
     </div>
 
-    <!-- Carte et appel à l'action -->
     <div class="cta">
       <h2>Venez le tester !</h2>
-      <div class="map-placeholder">
-        <img src="https://via.placeholder.com/400x300?text=Map" alt="Carte pour trouver un bar" />
-        <button class="btn-find-bar">Trouver un bar</button>
+
+      <div class="map-container">
+        <Map v-if="!isLoadingBars" :bars="bars" />
       </div>
     </div>
 
     <Status v-if="showStatus" message="Votre avis a été ajouté" type="success" class="status-message" />
   </div>
-<div v-else >
+  <div v-else>
     <Loading />
   </div>
 
@@ -86,6 +82,7 @@ import Rating from "../components/Rating.vue";
 import Status from "../components/Status.vue";
 import { isAuthenticated } from "../store/user";
 import Loading from "../components/Loading.vue";
+import Map from "../components/Map.vue";
 
 const props = defineProps({
   id: {
@@ -94,11 +91,14 @@ const props = defineProps({
   },
 });
 
-// Initialisation des données
 const cocktailCrud = useFetchApiCrud("cocktails", import.meta.env.VITE_API_URL);
 const favoritesApi = useFetchApiCrud("users/me/favorites", import.meta.env.VITE_API_URL);
+const barsCrud = useFetchApiCrud('bars', import.meta.env.VITE_API_URL)
+
 const cocktail = ref({});
-const isLoading = ref(true); // État de chargement
+const bars = ref([]);
+const isLoading = ref(true);
+const isLoadingBars = ref(true);
 
 const isFavorite = ref(false);
 const isHovered = ref(false);
@@ -222,12 +222,35 @@ const displayStatus = () => {
 };
 
 const roundRank = (rank) => Math.round(rank * 10) / 10 || 0;
+
+async function fetchBars() {
+  isLoadingBars.value = true
+  try {
+    const data = await barsCrud.fetchApi({
+      url: '/bars',
+      method: 'GET',
+    })
+
+    console.log(data)
+
+    bars.value = data
+  } catch (e) {
+    error.value = true
+  } finally {
+    isLoadingBars.value = false
+  }
+}
+
+onMounted(() => {
+  fetchBars()
+})
+
+
 </script>
 
 
 
 <style scoped>
-/* Global */
 .cocktail-page {
   font-family: var(--body-font-family);
   color: var(--text-color);
@@ -238,38 +261,29 @@ const roundRank = (rank) => Math.round(rank * 10) / 10 || 0;
   width: 92%;
   position: fixed;
   margin-bottom: 1rem;
-  bottom: 4rem; /* Ajustez cette valeur pour qu'elle soit au-dessus de la barre de navigation */
+  bottom: 4rem;
   left: 50%;
   transform: translateX(-50%);
   z-index: 1000;
 }
 
 
-/* Image Principale réduite à un tiers */
 .cocktail-image img {
   width: 100%;
   height: 33.33%;
   max-height: 20rem;
-  /* Réduit la hauteur à un tiers de la taille actuelle */
   object-fit: cover;
-  /* Garde les proportions de l'image */
   border-bottom-left-radius: 1.25rem;
   border-bottom-right-radius: 1.25rem;
 }
 
-/* En-tête */
 .cocktail-header {
   font-weight: bold;
-  /* Met le titre en gras */
   font-size: 2.5rem;
-  /* Ajuste la taille du titre si nécessaire */
   margin: 0;
-  /* Enlève les marges par défaut du <h1> */
   color: var(--text-color);
-  /* Couleur du texte */
   text-align: center;
   margin-top: 0.625rem;
-  /* 10px en rem */
   position: relative;
   display: flex;
   flex-direction: column;
@@ -281,7 +295,6 @@ const roundRank = (rank) => Math.round(rank * 10) / 10 || 0;
   font-family: var(--heading-font-family);
   font-weight: var(--heading-font-weight);
   font-size: 2.5rem;
-  /* 2.5em reste inchangé */
   margin: 0;
   color: var(--text-color);
   display: flex;
@@ -294,13 +307,10 @@ const roundRank = (rank) => Math.round(rank * 10) / 10 || 0;
   align-items: center;
   justify-content: center;
   gap: 0.2rem;
-  /* Espace entre l'étoile et le texte */
   font-size: 1.2rem;
   color: var(--text-color);
-  /* Couleur du texte */
   font-weight: normal;
   margin-top: 0.625rem;
-  /* 10px en rem */
 }
 
 .cocktail-rating .star {
@@ -308,56 +318,41 @@ const roundRank = (rank) => Math.round(rank * 10) / 10 || 0;
   color: gold;
 }
 
-/* Bouton Favori */
 .favorite {
   margin-left: 0.625rem;
-  /* 10px en rem */
   cursor: pointer;
   transition: transform 0.3s, color 0.3s;
-  /* Ajout d'une transition fluide */
 }
 
 .favorite i {
   font-size: 1.8rem;
-  /* Augmente la taille du cœur */
   color: var(--primary-color);
 }
 
-/* Description */
 .cocktail-description {
   text-align: center;
   padding: 0.625rem 1.25rem;
-  /* 10px 20px en rem */
   font-size: 1.2rem;
-  /* 1.2em reste inchangé */
   color: var(--text-color);
 }
 
-/* Onglets Instructions/Ingredients */
 .cocktail-tabs {
   display: flex;
   justify-content: center;
   margin: 0.625rem 0;
-  /* 10px en rem */
 }
 
 .tab,
 .rating-button {
   background-color: var(--background-color);
-  /* Couleur par défaut pour les non-actifs */
   color: var(--text-color);
   font-weight: bold;
-  /* Couleur du texte par défaut */
   border: none;
   border-radius: 1.25rem;
-  /* 20px en rem */
   margin: 0 0.3125rem;
-  /* 5px en rem */
   padding: 0.5rem 1rem;
-  /* 8px 16px en rem */
   cursor: pointer;
   font-size: 1rem;
-  /* 1em reste inchangé */
 }
 
 .rating-button {
@@ -367,15 +362,11 @@ const roundRank = (rank) => Math.round(rank * 10) / 10 || 0;
 
 .tab.active {
   background-color: var(--primary-color);
-  /* Couleur pour l'onglet actif */
   color: white;
-  /* Couleur du texte pour l'onglet actif */
 }
 
-/* Liste des Ingrédients */
 .cocktail-ingredients {
   margin: 0.625rem 1.25rem;
-  /* 10px 20px en rem */
 }
 
 .cocktail-ingredients ul {
@@ -385,91 +376,19 @@ const roundRank = (rank) => Math.round(rank * 10) / 10 || 0;
 
 .cocktail-ingredients li {
   margin: 0.5rem 0;
-  /* 8px en rem */
   font-size: 1.2rem;
-  /* 1.2em reste inchangé */
   color: var(--text-color);
-}
-
-/* Instructions */
-.cocktail-instructions {
-  margin: 0.625rem 1.25rem;
-  /* 10px 20px en rem */
-}
-
-.cocktail-instructions ol {
-  padding-left: 1.25rem;
-  /* 20px en rem */
 }
 
 .cocktail-instructions li {
   margin: 0.5rem 0;
-  /* 8px en rem */
   font-size: 1.2rem;
-  /* 1.2em reste inchangé */
   color: var(--text-color);
 }
 
-/* Carte et Bouton */
 .cta {
   text-align: center;
   margin: 1.25rem 0;
-  /* 20px en rem */
-}
-
-.map-placeholder {
-  position: relative;
-}
-
-.map-placeholder img {
-  width: 100%;
-  border-radius: 0.75rem;
-  /* 12px en rem */
-}
-
-.btn-find-bar {
-  background-color: var(--primary-color);
-  color: #fff;
-  border: none;
-  border-radius: 1.25rem;
-  /* 20px en rem */
-  padding: 0.625rem 1.25rem;
-  /* 10px 20px en rem */
-  position: absolute;
-  bottom: 0.625rem;
-  /* 10px en rem */
-  left: 50%;
-  transform: translateX(-50%);
-  cursor: pointer;
-  font-size: 1rem;
-  /* 1em reste inchangé */
-}
-
-/* Barre de Navigation */
-.bottom-nav {
-  display: flex;
-  justify-content: space-around;
-  background-color: #f5f5f5;
-  padding: 0.625rem 0;
-  /* 10px en rem */
-  border-top: 0.0625rem solid #ddd;
-  /* 1px en rem */
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-}
-
-.bottom-nav button {
-  background: none;
-  border: none;
-  font-size: 1.2rem;
-  /* 1.2em reste inchangé */
-  color: var(--text-color);
-  cursor: pointer;
-}
-
-.bottom-nav button:focus {
-  color: var(--primary-color);
 }
 
 .rating-popup {

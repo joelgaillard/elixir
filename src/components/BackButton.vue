@@ -23,7 +23,7 @@ function goBack() {
 }
 
 .back-button:hover {
-color: var(--accent-color);
-cursor: pointer;
+  color: var(--accent-color);
+  cursor: pointer;
 }
 </style>

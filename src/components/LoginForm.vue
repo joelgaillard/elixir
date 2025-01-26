@@ -59,13 +59,10 @@ async function handleLogin() {
         })
 
         if (response?.token) {
-            // 1. Définir le token dans les headers
             setDefaultHeaders({ Authorization: `Bearer ${response.token}` })
 
-            // 2. Attendre que les headers soient mis à jour
             await new Promise(resolve => setTimeout(resolve, 100))
 
-            // 3. Récupérer les données utilisateur avec le nouveau token
             const userData = await authApi.fetchApi({
                 url: 'users/me',
                 method: 'GET',
@@ -74,7 +71,6 @@ async function handleLogin() {
                 }
             })
 
-            // 4. Mettre à jour le store
             user.value = userData
             isAuthenticated.value = true
             token.value = response.token

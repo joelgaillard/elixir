@@ -48,7 +48,7 @@ const messages = ref([]);
 const newMessage = ref('');
 const messagesContainer = ref(null);
 const barCrud = useFetchApiCrud('bars', import.meta.env.VITE_API_URL);
-const { coords, locationReady } = useLocationStore(); // Gestion de la localisation
+const { coords, locationReady } = useLocationStore();
 let wsService = null;
 const bar = ref(null);
 
@@ -58,7 +58,7 @@ const fetchBarInfo = async () => {
       url: `bars/${route.params.id}`,
       method: 'GET',
     });
-    bar.value = response; // Assignez directement l'objet reçu à `bar.value`
+    bar.value = response;
   } catch (e) {
   }
 };
@@ -138,14 +138,10 @@ const initializeWebSocket = () => {
   });
 };
 
-// Initialisation
 onMounted(async () => {
   await fetchBarInfo();
   await fetchMessages();
   if (isAuthenticated.value) {
-    // Récupère les informations sur le bar
-
-    // Observe la disponibilité de la localisation avant d'initialiser WebSocket
     watch(
       locationReady,
       (ready) => {
@@ -175,22 +171,22 @@ onUnmounted(() => {
 }
 
 .chat-header {
-    display: flex;
-    flex-direction: row;
-    justify-content: left;
-    align-items: center;
-    gap: 1rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  align-items: center;
+  gap: 1rem;
 }
 
 .image {
-    width: 3.5rem;
-    height: 3.5rem;
-    border-radius: 50%;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
 }
 
 .name {
-    font-size: 1rem;
-    font-weight: bold;
+  font-size: 1rem;
+  font-weight: bold;
 }
 
 .messages-container {

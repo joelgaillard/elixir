@@ -1,7 +1,7 @@
 <template>
   <div>
     <RegisterForm :email="email" :password="password" />
-</div>
+  </div>
 </template>
 
 <script setup>

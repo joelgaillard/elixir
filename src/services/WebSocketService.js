@@ -11,32 +11,31 @@ class ChatService {
     this.ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-    
+
         if (data.error) {
           return;
         }
-    
-        if (data.data && typeof data.data === 'object') {
+
+        if (data.data && typeof data.data === "object") {
           const { userId, content, username, timestamp } = data.data;
-    
+
           if (this.messageCallback) {
             this.messageCallback({ userId, username, content, timestamp });
           }
         } else {
         }
-      } catch (error) {
-      }
+      } catch (error) {}
     };
 
     this.ws.onerror = (error) => {
-      console.error('Erreur WebSocket:', error);
+      console.error("Erreur WebSocket:", error);
       if (this.errorCallback) {
         this.errorCallback(error);
       }
     };
 
     this.ws.onclose = () => {
-      console.log('Connexion WebSocket fermée');
+      console.log("Connexion WebSocket fermée");
       if (this.closeCallback) {
         this.closeCallback();
       }
@@ -45,13 +44,14 @@ class ChatService {
 
   sendMessage(messageData) {
     if (this.ws.readyState === WebSocket.OPEN) {
-      console.log('Envoi du message:', messageData); // Log pour vérifier les messages envoyés
-      this.ws.send(JSON.stringify({
-        username: messageData.username,
-        content: messageData.content
-      }));
+      this.ws.send(
+        JSON.stringify({
+          username: messageData.username,
+          content: messageData.content,
+        })
+      );
     } else {
-      console.error('WebSocket non connecté');
+      console.error("WebSocket non connecté");
     }
   }
 

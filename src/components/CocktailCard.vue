@@ -7,8 +7,7 @@
         <div class="rating"> <i class="fa-solid fa-star"></i> {{ roundRank(rank) }}/5 ({{ ratingsCount }}) </div>
       </div>
       <div class="favorite">
-        <i :class="favoriteIcon" @click.stop="toggleFavorite"
-          @mouseover="!isMobile && (isHovered = true)"
+        <i :class="favoriteIcon" @click.stop="toggleFavorite" @mouseover="!isMobile && (isHovered = true)"
           @mouseleave="!isMobile && (isHovered = false)"></i>
       </div>
     </div>
@@ -31,7 +30,6 @@ onMounted(() => {
   isMobile.value = /Mobi|Android/i.test(navigator.userAgent)
 })
 
-// Définition des props avec validation
 const props = defineProps({
   id: {
     type: String,
@@ -161,13 +159,10 @@ const goToCocktailDetail = () => {
 
 .favorite i {
   font-size: 1.8rem;
-  /* Augmente la taille du cœur */
   color: var(--primary-color);
-  /* Facultatif : couleur du cœur */
   align-items: flex-end;
 }
 
-/* Augmenter la taille du texte lorsque la grille est en une seule colonne */
 @media (max-width: 399px) {
   .title {
     font-size: 1.8rem;

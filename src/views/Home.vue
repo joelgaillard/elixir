@@ -1,33 +1,33 @@
 <template>
   <div class="container">
-    <div v-if="!isAuthenticated"  class="login-container">
+    <div v-if="!isAuthenticated" class="login-container">
       <Button class="login-element" text="Se connecter" icon="fa fa-user" @click="goToLogin" />
       <router-link class="login-element" :to="{ path: '/register', query: $route.query }">S’inscrire</router-link>
     </div>
 
     <h1>Cocktails</h1>
     <div class="toolbar">
-      <!-- Barre de recherche -->
+
       <div class="search-bar">
         <SearchBar @search-results="handleSearchResults" @reset-search="resetSearch" />
       </div>
 
-      <!-- Filtres avec indicateur de chargement pour les ingrédients -->
+
       <div class="dropdown-filter">
         <DropdownFilter :default-text="'Filtrer par ingrédients'" :options="ingredients" @filter-selected="handleFilter"
           @reset-filters="resetFilters" />
       </div>
 
-      <!-- Tri -->
+
       <div class="dropdown-sort">
         <DropdownSort :options="sortOptions" @sort-selected="handleSort" />
       </div>
     </div>
 
-    <!-- Indicateur de chargement pour la grille -->
+
     <Loading v-if="loading" label="Chargement" />
 
-    <!-- Grille des cocktails -->
+
     <div v-else>
       <div class="cocktail-grid">
         <div v-for="cocktail in cocktails" :key="cocktail._id" class="cocktail-card">
@@ -37,7 +37,7 @@
       </div>
     </div>
 
-    <!-- Pagination -->
+
     <div class="pagination">
       <Pagination :currentPage="currentPage" :totalPages="totalPages" @page-changed="handlePageChange" />
     </div>
@@ -80,7 +80,7 @@ const cocktailCrud = useFetchApiCrud('cocktails', import.meta.env.VITE_API_URL)
 const ingredientsCrud = useFetchApiCrud('ingredients', import.meta.env.VITE_API_URL)
 
 async function fetchCocktails() {
-  loading.value = true // Début du chargement
+  loading.value = true
   try {
     let url = `cocktails?page=${currentPage.value}`
 
@@ -106,7 +106,7 @@ async function fetchCocktails() {
   } catch (e) {
     error.value = true
   } finally {
-    loading.value = false // Fin du chargement
+    loading.value = false
   }
 }
 
@@ -136,10 +136,10 @@ const resetFilters = () => {
 }
 
 const handleSort = (sortOption) => {
-  selectedSort.value = sortOption; // sortOption sera la "value" (en anglais)
-  sortOrder.value = sortOption === 'name' ? 'asc' : 'desc'; // Exemple de logique pour l'ordre
+  selectedSort.value = sortOption;
+  sortOrder.value = sortOption === 'name' ? 'asc' : 'desc';
   currentPage.value = 1;
-  fetchCocktails(); // Requête avec les valeurs en anglais
+  fetchCocktails();
 };
 
 const handlePageChange = (page) => {
@@ -163,7 +163,6 @@ function resetSearch() {
   fetchCocktails()
 }
 
-// Initialisation des données
 onMounted(() => {
   fetchCocktails()
   fetchIngredients()
@@ -200,37 +199,32 @@ onMounted(() => {
     flex-direction: row-reverse;
   }
 
-  
+
 }
 
-/* Mobile grand/Tablette portrait (400px - 767px) : 2 colonnes */
 @media (min-width: 400px) and (max-width: 767px) {
   .cocktail-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-/* Tablette/Petit desktop (768px - 1023px) : 3 colonnes */
 @media (min-width: 768px) and (max-width: 1023px) {
   .cocktail-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
-/* Desktop (1024px - 1439px) : 4 colonnes */
 @media (min-width: 1024px) and (max-width: 1439px) {
   .cocktail-grid {
     grid-template-columns: repeat(4, 1fr);
   }
 }
 
-/* Grand desktop (≥ 1440px) : 6 colonnes */
 @media (min-width: 1440px) {
   .cocktail-grid {
     grid-template-columns: repeat(6, 1fr);
   }
 }
-
 
 .pagination {
   display: flex;
@@ -251,45 +245,35 @@ onMounted(() => {
 
 }
 
-/* Largeurs spécifiques des éléments */
 .search-bar {
   flex: 2 1 60%;
-  /* Recherche occupe 50% en grand écran */
 }
 
 .dropdown-filter,
 .dropdown-sort {
   flex: 1 1 20%;
-  /* Chaque menu occupe 25% en grand écran */
 }
 
-/* Petit écran : chaque élément prend 100% */
 @media (max-width: 767px) {
   .toolbar>* {
     flex: 1 1 100%;
-    /* Chaque élément occupe toute la largeur */
   }
 }
 
-/* Écran moyen : recherche sur une ligne, filtres sur une autre */
 @media (min-width: 768px) and (max-width: 1023px) {
   .search-bar {
     flex: 1 1 100%;
-    /* Recherche occupe toute la largeur */
   }
 
   .dropdown-filter,
   .dropdown-sort {
     flex: 1 1 48%;
-    /* Chaque filtre prend 50% */
   }
 }
 
-/* Grand écran : tout aligné horizontalement */
 @media (min-width: 1024px) {
   .toolbar {
     flex-wrap: nowrap;
-    /* Tout reste sur une seule ligne */
   }
 }
 </style>

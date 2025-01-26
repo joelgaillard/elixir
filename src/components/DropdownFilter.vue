@@ -1,85 +1,78 @@
 <template>
-    <div class="dropdown-filter">
-      <button @click="toggleDropdown" class="dropdown-button">
-        {{ displayText }}
-        <span class="icon"><i class="fa-solid fa-filter"></i></span>
-      </button>
-      <ul v-if="showDropdown" class="dropdown-menu">
-        <li class="reset-filters" @click="resetFilters">
-          <button class="reset-button">Réinitialiser les filtres</button>
-        </li>
-        <li 
-          v-for="option in options" 
-          :key="option" 
-          @click="toggleFilter(option)"
-          :class="{ 'selected': selectedFilters.includes(option) }">
-          <input 
-            type="checkbox" 
-            :checked="selectedFilters.includes(option)"
-          >
-          {{ option }}
-        </li>
-      </ul>
-    </div>
-  </template>
-  
-  <script setup>
-  import { ref, computed } from 'vue';
-  
-  const props = defineProps({
-    options: {
-      type: Array,
-      required: true,
-    },
-    defaultText: {
-      type: String,
-      default: "Filtrer par type",
-    },
-  });
-  
-  const emit = defineEmits(['filter-selected', 'reset-filters']);
-  
-  const selectedFilters = ref([]);
-  const showDropdown = ref(false);
-  
-  const displayText = computed(() => {
-    if (selectedFilters.value.length === 1) {
-      return `${selectedFilters.value.length} ingrédient sélectionné`;
-    } else if (selectedFilters.value.length > 1) {
-      return `${selectedFilters.value.length} ingrédients sélectionnés`;
-    } else {
-        return props.defaultText;
-        }
-    });  
-  function toggleDropdown() {
-    showDropdown.value = !showDropdown.value;
-  }
-  
-  function toggleFilter(option) {
-    const index = selectedFilters.value.indexOf(option);
-    if (index === -1) {
-      selectedFilters.value.push(option);
-    } else {
-      selectedFilters.value.splice(index, 1);
-    }
-    emit('filter-selected', selectedFilters.value);
-  }
-  
-  function resetFilters() {
-    selectedFilters.value = [];
-    emit('reset-filters');
-    showDropdown.value = false;
-  }
-  </script>
+  <div class="dropdown-filter">
+    <button @click="toggleDropdown" class="dropdown-button">
+      {{ displayText }}
+      <span class="icon"><i class="fa-solid fa-filter"></i></span>
+    </button>
+    <ul v-if="showDropdown" class="dropdown-menu">
+      <li class="reset-filters" @click="resetFilters">
+        <button class="reset-button">Réinitialiser les filtres</button>
+      </li>
+      <li v-for="option in options" :key="option" @click="toggleFilter(option)"
+        :class="{ 'selected': selectedFilters.includes(option) }">
+        <input type="checkbox" :checked="selectedFilters.includes(option)">
+        {{ option }}
+      </li>
+    </ul>
+  </div>
+</template>
 
-  <style scoped>
+<script setup>
+import { ref, computed } from 'vue';
 
+const props = defineProps({
+  options: {
+    type: Array,
+    required: true,
+  },
+  defaultText: {
+    type: String,
+    default: "Filtrer par type",
+  },
+});
+
+const emit = defineEmits(['filter-selected', 'reset-filters']);
+
+const selectedFilters = ref([]);
+const showDropdown = ref(false);
+
+const displayText = computed(() => {
+  if (selectedFilters.value.length === 1) {
+    return `${selectedFilters.value.length} ingrédient sélectionné`;
+  } else if (selectedFilters.value.length > 1) {
+    return `${selectedFilters.value.length} ingrédients sélectionnés`;
+  } else {
+    return props.defaultText;
+  }
+});
+function toggleDropdown() {
+  showDropdown.value = !showDropdown.value;
+}
+
+function toggleFilter(option) {
+  const index = selectedFilters.value.indexOf(option);
+  if (index === -1) {
+    selectedFilters.value.push(option);
+  } else {
+    selectedFilters.value.splice(index, 1);
+  }
+  emit('filter-selected', selectedFilters.value);
+}
+
+function resetFilters() {
+  selectedFilters.value = [];
+  emit('reset-filters');
+  showDropdown.value = false;
+}
+</script>
+
+<style scoped>
 .dropdown-filter {
   position: relative;
-  width: auto; /* S'adapte au contenu ou au conteneur */
-  max-width: 100%; /* Évite de dépasser la largeur parent */
-  flex: 1 1 auto; /* Intégration fluide dans une disposition flexbox */
-  box-sizing: border-box; /* Inclure marges et bordures dans les dimensions */
+  width: auto;
+  max-width: 100%;
+  flex: 1 1 auto;
+  box-sizing: border-box;
 }
 
 .dropdown-button {
@@ -110,7 +103,7 @@
   list-style: none;
   max-height: 15rem;
   overflow-y: auto;
-  z-index: 10; /* Ajustement pour éviter les conflits */
+  z-index: 10;
 }
 
 .dropdown-button:hover,
@@ -158,6 +151,4 @@
 .icon {
   margin-left: 0.5rem;
 }
-
-
-  </style>
+</style>

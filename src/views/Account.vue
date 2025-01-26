@@ -93,7 +93,8 @@
         </div>
       </form>
     </div>
-    <Status v-if="showStatus" message="Vos informations personnelles ont été mises à jour" type="success" class="status-message" />
+    <Status v-if="showStatus" message="Vos informations personnelles ont été mises à jour" type="success"
+      class="status-message" />
   </div>
   <ConnectionLanding activeIcon="fa-solid fa-user" v-else />
 </template>
@@ -155,14 +156,14 @@ const hasChanges = computed(() => {
   const emailChanged = userInfo.value.email !== originalUserInfo.value.email;
 
   return (
-    passwordsFilled || // Tous les champs de mot de passe sont remplis (on modifie le mot de passe)
-    (passwordsEmpty && (usernameChanged || emailChanged)) // Aucun champ de mot de passe n'est rempli et au moins un autre champ est modifié
+    passwordsFilled ||
+    (passwordsEmpty && (usernameChanged || emailChanged))
   );
 });
 
 const hasDeleteChanges = computed(() => {
   return (
-    deletePasswords.value.password && 
+    deletePasswords.value.password &&
     deletePasswords.value.confirmPassword
   );
 });
@@ -206,11 +207,11 @@ async function verifyPassword(password, field) {
 
     return response?.token
   } catch (e) {
-   
-      errors.value = [{
-        field: field,
-        msg: 'Mot de passe incorrect.'
-      }]
+
+    errors.value = [{
+      field: field,
+      msg: 'Mot de passe incorrect.'
+    }]
     return null
   }
 }
@@ -251,7 +252,6 @@ async function handleSave() {
     return
   }
 
-  // Vérifier les mots de passe s'ils sont différents
   if (passwords.value.newPassword && passwords.value.newPassword !== passwords.value.confirmNewPassword) {
     errors.value = [{ field: 'confirmNewPassword', msg: 'Les mots de passe ne correspondent pas.' }]
     return
@@ -276,7 +276,6 @@ async function handleSave() {
     if (!response.ok) {
       const errorData = await response.json();
 
-      // Stocker les erreurs dans un format compatible avec getError
       if (errorData.errors) {
         errors.value = errorData.errors.map(err => ({
           field: err.field,
@@ -290,15 +289,13 @@ async function handleSave() {
 
     const data = await response.json();
 
-// Ne mettez à jour que les champs retournés par l'API
-if (data.user.username) user.value.username = data.user.username;
-if (data.user.email) user.value.email = data.user.email;
+    if (data.user.username) user.value.username = data.user.username;
+    if (data.user.email) user.value.email = data.user.email;
 
-// Synchronisez aussi les champs locaux
-if (data.user.username) userInfo.value.username = data.user.username;
-if (data.user.email) userInfo.value.email = data.user.email;
+    if (data.user.username) userInfo.value.username = data.user.username;
+    if (data.user.email) userInfo.value.email = data.user.email;
 
-displayStatus();
+    displayStatus();
     resetState();
   } catch (error) {
     errors.value = [{ field: 'global', msg: 'Erreur lors de la mise à jour des informations utilisateur.' }];
@@ -306,9 +303,8 @@ displayStatus();
 }
 
 async function handleDeleteAccount() {
-  errors.value = []; // Réinitialiser les erreurs
+  errors.value = [];
 
-  // Vérifier si les champs sont vides
   if (!deletePasswords.value.password) {
     errors.value.push({ field: 'deletePassword', msg: 'Le mot de passe est requis.' });
   }
@@ -316,7 +312,6 @@ async function handleDeleteAccount() {
     errors.value.push({ field: 'confirmDeletePassword', msg: 'Veuillez confirmer le mot de passe.' });
   }
 
-  // Vérifier que les mots de passe correspondent
   if (deletePasswords.value.password !== deletePasswords.value.confirmPassword) {
     errors.value.push({
       field: 'confirmDeletePassword',
@@ -324,13 +319,11 @@ async function handleDeleteAccount() {
     });
   }
 
-  // Si des erreurs sont présentes, stoppez l'exécution
   if (errors.value.length > 0) return;
 
-  // Validation du mot de passe via l'API
   if (deletePasswords.value.password) {
     const token = await verifyPassword(deletePasswords.value.password, 'deletePassword');
-    if (!token) return; // La méthode `verifyPassword` ajoutera ses propres erreurs si elle échoue
+    if (!token) return;
   }
 
   try {
@@ -342,7 +335,7 @@ async function handleDeleteAccount() {
       }
     });
 
-    handleLogout(); // Suppression réussie
+    handleLogout();
   } catch (error) {
     errors.value.push({
       field: 'global',
@@ -407,9 +400,7 @@ h2 {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  /* Espace entre le texte et l'icône */
   margin-bottom: 1.5rem;
-  /* Augmente l'espace sous le lien */
   cursor: pointer;
   text-decoration: none;
 }
@@ -426,15 +417,12 @@ h2 {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  /* Espace entre le texte et l'icône */
   margin-bottom: 1.5rem;
-  /* Augmente l'espace sous le lien */
   cursor: pointer;
   text-decoration: none;
   color: var(--error);
   font-size: 2rem;
   font-family: var(--sen-bold);
-  /* Utiliser la police de caractères personnalisée */
   font-weight: var(--bold);
 
 }
@@ -481,11 +469,9 @@ label {
   width: 92%;
   position: fixed;
   margin-bottom: 1rem;
-  bottom: 4rem; /* Ajustez cette valeur pour qu'elle soit au-dessus de la barre de navigation */
+  bottom: 4rem;
   left: 50%;
   transform: translateX(-50%);
   z-index: 1000;
 }
-
-
 </style>

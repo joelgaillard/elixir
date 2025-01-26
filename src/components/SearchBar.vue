@@ -1,11 +1,6 @@
 <template>
   <div class="search-container">
-    <input 
-      type="text"
-      v-model="searchQuery"
-      placeholder="Rechercher..."
-      class="search-input"
-    />
+    <input type="text" v-model="searchQuery" placeholder="Rechercher..." class="search-input" />
     <i class="fa-solid fa-magnifying-glass search-icon"></i>
   </div>
 </template>
@@ -29,43 +24,41 @@ watch(searchQuery, (newValue) => {
           url: `cocktails?name=${newValue}`,
           method: 'GET'
         })
-        // Émet les résultats et la requête actuelle
         emit('search-results', { cocktails: response.cocktails, pagination: response.pagination }, newValue)
       } catch (error) {
       }
     } else {
-      emit('reset-search') // Réinitialise la recherche
+      emit('reset-search')
     }
   }, 300)
 })
 </script>
 
 <style scoped>
-
 .search-container {
   display: flex;
   align-items: center;
   position: relative;
 }
 
-  .has-error input {
+.has-error input {
   border-color: var(--error);
 }
 
 .search-input {
   width: 100%;
-    padding: 0.75rem;
-    padding-left: 2.5rem;
-    border: 1px solid #ccc;
-    border-radius: 1.875rem;
-    font-size: 1rem;
-    outline: none;
-    transition: border-color 0.3s;
+  padding: 0.75rem;
+  padding-left: 2.5rem;
+  border: 1px solid #ccc;
+  border-radius: 1.875rem;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s;
 }
 
 .search-input:focus {
-    border-color: var(--primary-color)
-  }
+  border-color: var(--primary-color)
+}
 
 .search-icon {
   position: absolute;
