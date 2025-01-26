@@ -191,6 +191,7 @@ function toggleDelete() {
 function handleLogout() {
   isAuthenticated.value = false
   user.value = null
+  token.value = null
   setDefaultHeaders({ Authorization: '' })
   router.push('/')
 }
@@ -311,14 +312,10 @@ async function handleDeleteAccount() {
   }
 
   try {
-    await fetch('/api/users/me', {
+  await usersApi.fetchApi({
+      url: 'users/me',
       method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token.value}`,
-      }
     });
-
     handleLogout();
   } catch (error) {
     errors.value.push({
